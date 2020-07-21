@@ -1,0 +1,204 @@
+REM ---------------------------------------------------------------------------------------------------------------------------------------
+CLS
+@ECHO ON
+setlocal enableextensions
+cd /d "%~dp0"
+cd ..\..
+
+REM =================================================================================================================
+SET ROOT_FOLDER=%CD%
+SET SRC_SCRIPT_ROOT=%ROOT_FOLDER%\build\script\windows
+SET SRC_AGENTCONFIG_ROOT=%ROOT_FOLDER%\build\config
+SET SRC_MODULECONFIG_ROOT=%ROOT_FOLDER%\build\config\module\win
+SET SRC_DOC_ROOT=%ROOT_FOLDER%\build\doc
+SET RELEASE_ROOT=%ROOT_FOLDER%\build\Release
+SET TARGET_CONFIG_ROOT=%RELEASE_ROOT%
+SET TARGET_DOC_ROOT=%RELEASE_ROOT%\doc
+SET TARGET_MODULE_ROOT=%RELEASE_ROOT%\module
+
+SET SRC_SOURCE_ROOT=%ROOT_FOLDER%\build\WISEAgent
+SET SRC_SOURCE_INCLUDE=%ROOT_FOLDER%\Include
+SET SRC_SOURCE_PLATFORM=%ROOT_FOLDER%\Platform
+SET SRC_SOURCE_SAMPLE=%ROOT_FOLDER%\Sample
+SET SRC_SOURCE_LIBRARY=%ROOT_FOLDER%\Library
+SET SRC_SOURCE_LIB_UTIL=%ROOT_FOLDER%\Lib_Util
+SET SRC_SOURCE_LIB_EI=%ROOT_FOLDER%\Lib_EI
+SET SRC_SOURCE_LIB_SRP=%ROOT_FOLDER%\Lib_SRP
+SET SRC_SOURCE_THIRDLIBRARY=%ROOT_FOLDER%\Library3rdParty
+SET SRC_SOURCE_MODULE=%ROOT_FOLDER%\Modules
+SET TARGET_SOURCE_ROOT=%ROOT_FOLDER%\Output\WISEAgent
+SET TARGET_SOURCE_DOC=%ROOT_FOLDER%\Output\WISEAgent\Doc
+SET TARGET_SOURCE_INCLUDE=%ROOT_FOLDER%\Output\WISEAgent\Include
+SET TARGET_SOURCE_PLATFORM=%ROOT_FOLDER%\Output\WISEAgent\Platform
+SET TARGET_SOURCE_SAMPLE=%ROOT_FOLDER%\Output\WISEAgent\Sample
+SET TARGET_SOURCE_LIBRARY=%ROOT_FOLDER%\Output\WISEAgent\Library
+SET TARGET_SOURCE_THIRDLIBRARY=%ROOT_FOLDER%\Output\WISEAgent\Library3rdParty
+ECHO ==========================
+ECHO == Copy files           ==
+ECHO ==========================
+REM Remove Achieve Folder and subdirectores.
+REM RD /S/Q "%TARGET_CONFIG_ROOT%"
+MD "%TARGET_MODULE_ROOT%"
+set version=%1
+if defined version goto checkVar
+goto Var31
+:checkVar
+	for /F "tokens=1-4 delims=." %%a in ("%version%") do (
+		set MAIN_VERSION=%%a
+		set SUB_VERSION=%%b
+	)	
+
+	if %MAIN_VERSION%.%SUB_VERSION%==3.0 goto Var30
+	goto Var31
+:Var30
+	COPY /Y "%SRC_MODULECONFIG_ROOT%\module_config_30.xml" "%TARGET_MODULE_ROOT%\module_config.xml"
+		CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	goto result
+:Var31
+	COPY /Y "%SRC_MODULECONFIG_ROOT%\module_config.xml" "%TARGET_MODULE_ROOT%\module_config.xml"
+		CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+:result
+
+RD /S/Q "%TARGET_DOC_ROOT%"
+
+REM XCOPY /Y "%SRC_DOC_ROOT%" "%TARGET_DOC_ROOT%\"
+MD "%TARGET_DOC_ROOT%"
+COPY /Y "%SRC_DOC_ROOT%\WISE-PaaS RMM 3.1_Agent_UM*.pdf" "%TARGET_DOC_ROOT%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+COPY /Y "%SRC_AGENTCONFIG_ROOT%\log.ini" "%TARGET_CONFIG_ROOT%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+COPY /Y "%SRC_AGENTCONFIG_ROOT%\changelog" "%TARGET_CONFIG_ROOT%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+XCOPY /E/Y "%SRC_SCRIPT_ROOT%" "%RELEASE_ROOT%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+exit 0
+ECHO ===========================
+ECHO == Source Release Folder ==
+ECHO ===========================
+
+RD /S/Q "%TARGET_SOURCE_ROOT%"
+
+XCOPY /E/Y "%SRC_SOURCE_ROOT%" "%TARGET_SOURCE_ROOT%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_DOC%"
+
+REM XCOPY /Y "%SRC_DOC_ROOT%" "%TARGET_SOURCE_DOC%\"
+MD "%TARGET_SOURCE_DOC%"
+COPY /Y "%SRC_DOC_ROOT%\WISE-PaaS RMM 3.1_WISE-Agent_Command_Format_DG*.pdf" "%TARGET_SOURCE_DOC%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+COPY /Y "%SRC_DOC_ROOT%\WISE-PaaS RMM 3.1_WISE-Agent_DG*.pdf" "%TARGET_SOURCE_DOC%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_SAMPLE%"
+
+XCOPY /E/Y "%SRC_SOURCE_SAMPLE%" "%TARGET_SOURCE_SAMPLE%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_INCLUDE%"
+
+XCOPY /E/Y "%SRC_SOURCE_INCLUDE%" "%TARGET_SOURCE_INCLUDE%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_PLATFORM%"
+
+XCOPY /E/Y "%SRC_SOURCE_PLATFORM%" "%TARGET_SOURCE_PLATFORM%\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\cJSON"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\cJSON" "%TARGET_SOURCE_LIBRARY%\cJSON\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\FtpHelper"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\FtpHelper" "%TARGET_SOURCE_LIBRARY%\FtpHelper\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\Log"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\Log" "%TARGET_SOURCE_LIBRARY%\Log\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\MD5"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\MD5" "%TARGET_SOURCE_LIBRARY%\MD5\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\DES"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\DES" "%TARGET_SOURCE_LIBRARY%\DES\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\Base64"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\Base64" "%TARGET_SOURCE_LIBRARY%\Base64\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\MessageGenerator"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\MessageGenerator" "%TARGET_SOURCE_LIBRARY%\MessageGenerator\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\SAClient"
+XCOPY /E/Y "%SRC_SOURCE_LIB_SRP%\SAClient" "%TARGET_SOURCE_LIBRARY%\SAClient\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\SAConfig"
+XCOPY /E/Y "%SRC_SOURCE_LIB_SRP%\SAConfig" "%TARGET_SOURCE_LIBRARY%\SAConfig\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\SAGeneralHandler"
+XCOPY /E/Y "%SRC_SOURCE_LIB_SRP%\SAGeneralHandler" "%TARGET_SOURCE_LIBRARY%\SAGeneralHandler\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\SAHandlerLoader"
+XCOPY /E/Y "%SRC_SOURCE_LIB_SRP%\SAHandlerLoader" "%TARGET_SOURCE_LIBRARY%\SAHandlerLoader\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\SAManager"
+XCOPY /E/Y "%SRC_SOURCE_LIB_SRP%\SAManager" "%TARGET_SOURCE_LIBRARY%\SAManager\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\MosquittoCarrier"
+XCOPY /E/Y "%SRC_SOURCE_LIB_EI%\MosquittoCarrier" "%TARGET_SOURCE_LIBRARY%\MosquittoCarrier\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\MQTTConnector"
+XCOPY /E/Y "%SRC_SOURCE_LIB_EI%\MQTTConnector" "%TARGET_SOURCE_LIBRARY%\MQTTConnector\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\WISECore"
+XCOPY /E/Y "%SRC_SOURCE_LIB_EI%\WISECore" "%TARGET_SOURCE_LIBRARY%\WISECore\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\curl-7.47.1.win32"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\curl-7.47.1.win32" "%TARGET_SOURCE_THIRDLIBRARY%\curl-7.47.1.win32\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\libxml2-2.7.8.win32"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\libxml2-2.7.8.win32" "%TARGET_SOURCE_THIRDLIBRARY%\libxml2-2.7.8.win32\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\mosquitto-1.4.10.win32"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\mosquitto-1.4.10.win32" "%TARGET_SOURCE_THIRDLIBRARY%\mosquitto-1.4.10.win32\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\openssl-1.0.1h.win32"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\openssl-1.0.1h.win32" "%TARGET_SOURCE_THIRDLIBRARY%\openssl-1.0.1h.win32\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\AdvLog"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\AdvLog" "%TARGET_SOURCE_THIRDLIBRARY%\AdvLog\"
+	CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\ReadINI"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\ReadINI" "%TARGET_SOURCE_LIBRARY%\ReadINI\"
+CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+
+RD /S/Q "%TARGET_SOURCE_LIBRARY%\HandlerKernel"
+XCOPY /E/Y "%SRC_SOURCE_LIB_UTIL%\HandlerKernel" "%TARGET_SOURCE_LIBRARY%\HandlerKernel\"
+CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%
+	
+RD /S/Q "%TARGET_SOURCE_THIRDLIBRARY%\libmodbus-3.1.2"
+XCOPY /E/Y "%SRC_SOURCE_THIRDLIBRARY%\libmodbus-3.1.2" "%TARGET_SOURCE_THIRDLIBRARY%\libmodbus-3.1.2\"
+CALL "%~dp0Fail_Check.bat" %ERRORLEVEL%	
+

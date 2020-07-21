@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Advantech Compression library
+Description: Compression library
+URL: 
+Version: @VERSION@
+Requires:
+Libs: -lAdvCompression
+Cflags:

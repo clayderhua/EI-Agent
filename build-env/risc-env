@@ -1,0 +1,125 @@
+#!/bin/bash
+
+ENV_VANDER=$1
+ENV_PLAT=$2
+ENV_OS=$3
+
+ENV_VERSION=$4
+ENV_LIB=$5
+
+TARGET=risc-"$ENV_VANDER"-"$ENV_PLAT"-"$ENV_OS"
+echo "TARGET=$TARGET"
+
+if [ "$TARGET" == "risc-fsl-imx6-yocto" ]; then
+    if [ "$ENV_VERSION" == "" ]; then
+        ENV_VERSION="1.5.3"
+    fi
+    if [ $ENV_VERSION != "2.1" ]; then # < 2.1
+        ENV_SCRIPT=/opt/poky/"$ENV_VERSION"/environment-setup-cortexa9hf-vfp-neon-poky-linux-gnueabi
+        ROOTFS=/opt/poky/"$ENV_VERSION"/sysroots/cortexa9hf-vfp-neon-poky-linux-gnueabi
+        TARGET_PLATFORM_NAME="Poky_1.5.3"
+    elif [ $ENV_VERSION == "2.1" ]; then
+        ENV_SCRIPT=/opt/poky/"$ENV_VERSION"/environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+        ROOTFS=/opt/poky/"$ENV_VERSION"/sysroots/cortexa9hf-neon-poky-linux-gnueabi/
+        TARGET_PLATFORM_NAME="Poky_2.1.1"
+    fi
+    HOST="arm-poky-linux-gnueabi"
+    TARGET_PLATFORM_ARCH="imx6"
+elif [ "$TARGET" == "risc-fsl-imx8-yocto" ] ; then
+    ENV_SCRIPT=/opt/fsl-imx-xwayland/4.14-sumo/environment-setup-aarch64-poky-linux
+    ROOTFS=/opt/fsl-imx-xwayland/4.14-sumo/sysroots/aarch64-poky-linux/
+    HOST="aarch64-poky-linux"
+    TARGET_PLATFORM_NAME="Poky_2.5.2"
+    TARGET_PLATFORM_ARCH="imx8"
+elif [ "$TARGET" == "risc-intel-quark-yocto" ] ; then
+    if [ "$ENV_VERSION" == "" ]; then
+        ENV_VERSION="1.4.2"
+    fi
+    if [ "$ENV_VERSION" == "1.4.2" ]; then
+        if [ "$ENV_LIB" == "eg" ]; then
+            echo "Use EG Library"
+            ENV_SCRIPT=/opt/clanton-full/"$ENV_VERSION"/environment-setup-i586-poky-linux
+            ROOTFS=/opt/clanton-full/"$ENV_VERSION"/sysroots/i586-poky-linux/
+        else # "$ENV_LIB" == "uc"
+    
+            echo "Use UC Library"
+            ENV_SCRIPT=/opt/clanton-tiny/"$ENV_VERSION"/environment-setup-i586-poky-linux-uclibc
+            ROOTFS=/opt/clanton-tiny/"$ENV_VERSION"/sysroots/i586-poky-linux-uclibc/
+        fi
+        TARGET_PLATFORM_NAME="Poky_1.4.2"
+    elif [ "$ENV_VERSION" == "1.7.2" ]; then
+        ENV_SCRIPT=/opt/iot-devkit/"$ENV_VERSION"/environment-setup-i586-poky-linux
+        ROOTFS=/opt/iot-devkit/"$ENV_VERSION"/sysroots/i586-poky-linux/
+        TARGET_PLATFORM_NAME="Poky_1.7.2"
+    fi
+    HOST="i586-poky-linux"
+    TARGET_PLATFORM_ARCH="quark"
+elif [ "$TARGET" == "risc-intel-baytrail-idp" ] ; then
+    ENV_SCRIPT=/opt/windriver/wrlinux/7.0-intel-baytrail-64/environment-setup-corei7-64-wrs-linux
+    ROOTFS=/opt/windriver/wrlinux/7.0-intel-baytrail-64/sysroots/corei7-64-wrs-linux
+    HOST="x86_64-wrs-linux"
+    TARGET_PLATFORM_NAME="Linux-WR-IDP-XT-3.1-intel"
+    TARGET_PLATFORM_ARCH="x64"    
+elif [ "$TARGET" == "risc-intel-haswell-idp" ] ; then
+    ENV_SCRIPT=/opt/windriver/wrlinux/7.0-intel-haswell-64/environment-setup-haswell-64-wrs-linux
+    ROOTFS=/opt/windriver/wrlinux/7.0-intel-haswell-64/sysroots/haswell-64-wrs-linux/
+elif [ "$TARGET" == "risc-qualcomm-dragon-yocto" ] ; then
+    ENV_SCRIPT=/opt/poky/oecore-x86_64/environment-setup-aarch64-oe-linux
+    ROOTFS=/opt/poky/oecore-x86_64/sysroots/aarch64-oe-linux/
+    HOST="aarch64-oe-linux"
+    TARGET_PLATFORM_NAME="Poky_2.1.3"
+    TARGET_PLATFORM_ARCH="apq8016"       
+elif [ "$TARGET" == "risc-wise-openwrt-yocto" ] ; then
+    ROOTFS="/opt/openwrt/ipq806x/target-arm_cortex-a7_uClibc-0.9.33.2_eabi/root-ipq806x"
+    HOST="arm-openwrt-linux"
+    TARGET_PLATFORM_NAME="openwrt_qcom"
+    TARGET_PLATFORM_ARCH="ipq806x"
+    export STAGING_DIR=$ROOTFS
+    ENV_SCRIPT=/opt/openwrt/ipq806x/environment-setup-cortexa7-ipq806x-openwrt-unix-gnueabi
+elif [ "$TARGET" == "risc-rk-3399-debian" ] ; then
+    # RK does not need ENV_SCRIPT & ROOTFS variables.
+    # We build in the chroot environment.
+    HOST="aarch64-linux-gnu"
+    TARGET_PLATFORM_NAME="Debian_9.9"
+    TARGET_PLATFORM_ARCH="rk3399"
+    export CC="gcc"
+    export STRIP="strip"
+elif [ "$TARGET" == "risc-rk-3288-debian" ] ; then
+    ROOTFS=/
+    CROSS_TOOLCHAIN=/usr/bin
+    HOST="arm-linux-gnueabihf"
+    TARGET_PLATFORM_NAME="Debian_9.8"
+    TARGET_PLATFORM_ARCH="rk3288"
+    export CC="gcc"
+    export STRIP="strip"
+elif [ "$TARGET" == "risc-ti-am335x-yocto" ]; then
+    if [ $ENV_VERSION == "2.4" ]; then
+	TARGET_PLATFORM_NAME="arago-2018.10"
+	ENV_SCRIPT=/usr/local/"$TARGET_PLATFORM_NAME"/environment-setup
+	ROOTFS=/usr/local/"$TARGET_PLATFORM_NAME"/sysroots/armv7ahf-neon-linux-gnueabi/
+    fi
+    HOST="arm-linux-gnueabihf"
+    TARGET_PLATFORM_ARCH="am335x"
+fi
+#========= Cross toolchain =============================================================
+if [ "x$ENV_SCRIPT" != "x" ]; then
+    source $ENV_SCRIPT
+fi
+#========== rootfs =======================================================================
+export set ROOTFS
+
+export RISC_TARGET=risc
+export CHIP_VANDER=$ENV_VANDER
+export PLATFORM=$ENV_PLAT
+export OS_VERSION=$ENV_OS
+export TARGET_PLATFORM_NAME
+export TARGET_PLATFORM_ARCH
+export HOST
+
+echo "RISC_TARGET=risc"
+echo "CHIP_VANDER=$ENV_VANDER"
+echo "PLATFORM=$ENV_PLAT"
+echo "OS_VERSION=$ENV_OS"
+
+export OTA_TAGS="${RISC_TARGET},${CHIP_VANDER},${PLATFORM},${OS_VERSION}"
+echo "OTA_TAGS=${OTA_TAGS}"

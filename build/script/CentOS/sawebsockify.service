@@ -1,0 +1,28 @@
+
+[Unit]
+Description=RMM Websockify Service
+
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/AgentService/VNC
+Environment="VNC_PORT=`/bin/sed -n 's:.*<CustVNCPort>\(.*\)</CustVNCPort>.*:\1:p' /usr/local/AgentService/agent_config.xml`"
+ExecStart=/usr/local/AgentService/VNC/websockify 6081 'localhost:${VNC_PORT}'
+ExecStop=/usr/bin/killall websockify
+TimeoutSec=5
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+# SAAGENT_CONF="/usr/local/AgentService/agent_config.xml"
+# VNC_PORT=$(sed -n 's:.*<CustVNCPort>\(.*\)</CustVNCPort>.*:\1:p' $SAAGENT_CONF)
+# chdir "/usr/local/AgentService/VNC"			
+# exec  "/usr/local/AgentService/VNC/websockify" 6081 "localhost:${VNC_PORT}"
+
+
+
+
+

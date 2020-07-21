@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel=stylesheet type="text/css" href="assets/css/grid.css">
+<style>
+.rectbutton {
+	width: 113.3px;
+	height: 29.6px;
+	border-radius: 16.8px;
+	background-color: #553555;
+	font-family: Arial;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	color: #ffffff;
+	text-decoration: none;
+	border: solid 2px #553555;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.grayoutRectButton {
+	width: 113.3px;
+	height: 29.6px;
+	border-radius: 16.8px;
+	background-color: #553555;
+	font-family: Arial;
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	color: #ffffff;
+	text-decoration: none;
+	border: solid 2px #553555;
+	display: inline-block;
+	cursor: pointer;
+    opacity: 0.6;
+    filter: alpha(opacity = 60);
+}
+
+.Rectangle-1 {
+    background-color: #fafafa;
+    border: #c8c8c8;
+}
+
+.Rectangle-2 {
+    background-color: #ffffff;
+    border: #c8c8c8;
+}
+
+.title_bg {
+    width: 100%;
+    height: 30px;
+    background-color: #dbdbdb;
+}
+
+.header_hr {
+    width: 100%;
+    height: 2px;
+    background-color: #92308d;
+}
+
+.title_brand {
+    color: #92308d;
+    font-size: 14px;
+    font-weight: bolder;
+    font-family: Arial;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.center {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin: -31px 0 0 -31px;
+}
+
+.text-result {
+	width: 100%;
+	height: 100%;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="title_bg"><h1 class="title_brand">Wise-Agent Local Provision</h1></div>
+<div class="header_hr"></div>
+<div class="grid-container">
+	<div class="grid-default"></div>
+	<div id="div-devices" class="grid-devices">
+		<!--div class="Rectangle-1" style="display: flex">
+			<p><input type="checkbox" name="00000001-0000-0000-0000-000bab8cbdd9" value="172.22.12.56"></p>
+			<p style="float: left">00000001-0000-0000-0000-000bab8cbdd9</p>
+			<p style="float: left">(172.22.12.56)</p>
+		</div-->
+	</div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-default"></div>
+	<div class="grid-discover"><input type="button" id="button-discover" class="rectbutton" value="Discover" onclick="javascript:discover()"></div>
+	<div class="grid-button"><input type="button" id="button-active" class="grayoutRectButton" value="Active" onclick="javascript:active()" disabled></div>
+	<div class="grid-button"><input type="button" id="button-activeall" class="rectbutton" value="Active All" onclick="javascript:activeall()" disabled></div>
+	<div class="grid-default"></div>
+	<div class="grid-result">
+		<textarea id="text-result" class="text-result" cols="120" readonly>Please open port 9178 in firewall</textarea>
+	</div>
+	<div class="grid-fullcolumn"><input type="button" value="Clear" onclick="javascript:clearResult()"></div>
+
+	<div id="div-progress" class="modal" style="display: none;">
+		<img src="images/icon_l_loading.gif" alt="Loading..." class="center">
+	</div>
+</div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

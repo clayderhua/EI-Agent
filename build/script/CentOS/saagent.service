@@ -1,0 +1,18 @@
+[Unit]
+Description=RMM-Agent
+After=networking.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/AgentService/
+ExecStart=/usr/local/AgentService/cagent
+#ExecStop=/usr/bin/killall -15 cagent
+ExecStopPost=/bin/rm -f /var/run/saagent.pid
+TimeoutSec=20
+KillMode=process
+#KillMode=control-group
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

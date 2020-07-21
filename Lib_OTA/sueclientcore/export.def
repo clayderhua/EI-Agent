@@ -1,0 +1,27 @@
+LIBRARY "SUEClientCore"
+
+EXPORTS
+	SUECCoreInit
+	SUECCoreUninit
+	SUECCoreStart
+	SUECCoreStop
+	SUECCoreSetTaskStatusCB
+	SUECCoreGetTaskStatus
+	SUECCoreSetDpCheckCB
+	SUECCoreAddDLTask
+	SUECCoreSuspendDLTask
+	SUECCoreResumeDLTask
+	SUECCoreDelDLTask
+	SUECCoreCheckPkgExist
+	SUECCoreAddDPTask
+	SUECCoreSuspendDPTask
+	SUECCoreResumeDPTask
+	SUECCoreDelDPTask
+	SUECCoreCheckTaskExist
+	SUECCoreFreeTSInfo
+	SUECCoreFreeDLTaskInfo
+    SUECCoreGetSWInfos
+    SUECCoreGetRecordPkgVersion
+    SUECCoreDelDLPkgs
+    SUECCoreSetTaskNorms
+	SUECCoreGetErrMsg

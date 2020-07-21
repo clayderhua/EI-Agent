@@ -1,0 +1,20 @@
+LIBRARY	"DATASYNC"
+
+EXPORTS
+	DataSync_Initialize
+	DataSync_Uninitialize
+	DataSync_SetFuncCB
+	DataSync_Insert_Cap
+	DataSync_Insert_Data
+	DataSync_Set_LostTime
+	DataSync_Set_ReConTime
+	Handler_Initialize
+	Handler_Get_Status
+	Handler_OnStatusChange
+	Handler_Start
+	Handler_Stop
+	Handler_AutoReportStart
+	Handler_AutoReportStop
+	Handler_Get_Capability
+	Handler_MemoryFree
+	Handler_Recv

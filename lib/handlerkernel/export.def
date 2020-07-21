@@ -1,0 +1,59 @@
+LIBRARY	"HandlerKernel"
+
+EXPORTS
+	HandlerKernel_Initialize
+	HandlerKernel_Uninitialize
+
+	HandlerKernel_Start
+	HandlerKernel_Stop
+	
+	HandlerKernel_SetCapability
+	HandlerKernel_LockCapability
+	HandlerKernel_UnlockCapability
+	
+	HandlerKernel_AutoReportStart
+	HandlerKernel_AutoReportStop
+	
+	HandlerKernel_SetAutoReportFilter
+	HandlerKernel_SendAutoReportOnce
+	
+	HandlerKernel_LiveReportStart
+	HandlerKernel_ParseRecvCMD
+	HandlerKernel_ParseRecvCMDWithSessionID
+	
+	HandlerKernel_SetThreshold
+	HandlerKernel_DeleteAllThreshold
+	HandlerKernel_StartThresholdCheck
+	HandlerKernel_StopThresholdCheck
+	HandlerKernel_SetThresholdTrigger
+	
+	HandlerKernel_GetSensorData
+	HandlerKernel_SetSensorData
+	
+	HandlerKernelEx_Initialize
+	HandlerKernelEx_Uninitialize
+
+	HandlerKernelEx_Start
+	HandlerKernelEx_Stop
+	
+	HandlerKernelEx_SetCapability
+	HandlerKernelEx_LockCapability
+	HandlerKernelEx_UnlockCapability
+	
+	HandlerKernelEx_AutoReportStart
+	HandlerKernelEx_AutoReportStop
+	
+	HandlerKernelEx_SetAutoReportFilter
+	HandlerKernelEx_SendAutoReportOnce
+	
+	HandlerKernelEx_LiveReportStart
+	HandlerKernelEx_ParseRecvCMDWithSessionID
+	
+	HandlerKernelEx_SetThreshold
+	HandlerKernelEx_DeleteAllThreshold
+	HandlerKernelEx_StartThresholdCheck
+	HandlerKernelEx_StopThresholdCheck
+	HandlerKernelEx_SetThresholdTrigger
+	
+	HandlerKernelEx_GetSensorData
+	HandlerKernelEx_SetSensorData

@@ -1,0 +1,7 @@
+LIBRARY "aes"
+
+EXPORTS
+	init_aes_encode
+	init_aes_decode
+	aes_decode
+	aes_encode

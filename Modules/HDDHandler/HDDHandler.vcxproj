@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-IoTCore|Win32">
+      <Configuration>Debug-IoTCore</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-IoTCore|Win32">
+      <Configuration>Release-IoTCore</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EFDE7F9C-9C37-40E0-9944-A68DDB3C8035}</ProjectGuid>
+    <RootNamespace>HDDHandler</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental />
+    <LibraryPath>$(VCInstallDir)lib\onecore;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LibraryPath>$(VCInstallDir)lib\onecore;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Include;$(ProjectDir)..\..\Platform;$(ProjectDir)..\..\Platform\Windows;$(ProjectDir)..\..\lib\readini;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\lib\susihelper;$(ProjectDir)..\..\lib\sqflashhelper;$(ProjectDir)..\..\lib\messagegenerator;$(ProjectDir)..\..\lib\handlerkernel;$(ProjectDir)..\..\lib\log\inc;$(ProjectDir)..\..\Library3rdParty\susi4\include;$(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\inc;$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\Library3rdParty\iconv\Windows\include;$(ProjectDir)..\..\Library3rdParty\sqram\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\bin\x86\*.dll $(OutDir)
+copy $(ProjectDir)..\..\Library3rdParty\sqram\win32\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Platform;$(SolutionDir)Platform\Windows;$(SolutionDir)Lib_Util\ReadINI;$(SolutionDir)Lib_Util\cJSON;$(SolutionDir)Library\SUSIHelper;$(SolutionDir)Library\SQFlashHelper;$(SolutionDir)Lib_Util\MessageGenerator;$(SolutionDir)Lib_Util\HandlerKernel;$(SolutionDir)Lib_Util\Log;$(SolutionDir)Library3rdParty\SUSI4\include;$(SolutionDir)Library3rdParty\SQFlashV3.0\windows\inc;$(SolutionDir)Library3rdParty\libxml2-2.7.8.win32\include;$(SolutionDir)Library3rdParty\SQRAM\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\bin\x86\*.dll $(OutDir)
+copy $(ProjectDir)..\..\Library3rdParty\sqram\win32\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Include;$(ProjectDir)..\..\Platform;$(ProjectDir)..\..\Platform\Windows;$(ProjectDir)..\..\lib\readini;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\lib\susihelper;$(ProjectDir)..\..\lib\sqflashhelper;$(ProjectDir)..\..\lib\messagegenerator;$(ProjectDir)..\..\lib\handlerkernel;$(ProjectDir)..\..\lib\log\inc;$(ProjectDir)..\..\Library3rdParty\susi4\include;$(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\inc;$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\Library3rdParty\iconv\Windows\include;$(ProjectDir)..\..\Library3rdParty\sqram\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGSNDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\bin\x86\*.dll $(OutDir)
+copy $(ProjectDir)..\..\Library3rdParty\sqram\win32\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Include;$(SolutionDir)Platform;$(SolutionDir)Platform\Windows;$(SolutionDir)Lib_Util\ReadINI;$(SolutionDir)Lib_Util\cJSON;$(SolutionDir)Library\SUSIHelper;$(SolutionDir)Library\SQFlashHelper;$(SolutionDir)Lib_Util\MessageGenerator;$(SolutionDir)Lib_Util\HandlerKernel;$(SolutionDir)Lib_Util\Log;$(SolutionDir)Library3rdParty\SUSI4\include;$(SolutionDir)Library3rdParty\SQFlashV3.0\windows\inc;$(SolutionDir)Library3rdParty\libxml2-2.7.8.win32\include;$(SolutionDir)Library3rdParty\SQRAM\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINSOCK_DEPRECATED_NO_WARNINGSNDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(ProjectDir)..\..\Library3rdParty\sqflashv3.0\windows\bin\x86\*.dll $(OutDir)
+copy $(ProjectDir)..\..\Library3rdParty\sqram\win32\*.dll $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Library3rdParty\cjson\cJSON.vcxproj">
+      <Project>{c15929aa-2406-4764-842f-839e6b3f17fc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library3rdParty\libxml2\libxml2.vcxproj">
+      <Project>{c2ca23f6-44d3-4058-a6c6-65c791f539df}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\handlerkernel\HandlerKernel.vcxproj">
+      <Project>{636f4f8f-194f-439d-ad32-7b23ff7fa7e9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\log\Log.vcxproj">
+      <Project>{f7d10e10-1495-43de-8cd7-7f528e554508}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\messagegenerator\MessageGenerator.vcxproj">
+      <Project>{d2993f27-f4c3-4261-8362-ca96297446d0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\readini\ReadINI.vcxproj">
+      <Project>{9ce9bf28-3ac8-4937-9d74-51cd1c115636}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\sqflashhelper\SQFlashHelper.vcxproj">
+      <Project>{d3f647c2-0cb1-41d3-94e0-726ba5cc018a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\susihelper\SUSIHelper.vcxproj">
+      <Project>{b032f7b3-eeb5-4997-921e-9923e3552f66}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\WISEPlatform.vcxproj">
+      <Project>{c28b0ed4-d61c-4a16-9a2e-8b65ea726069}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\WISEUtil.vcxproj">
+      <Project>{b03503d0-8410-4fc4-a7e4-a318de24cb4c}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="HDDHandler.c" />
+    <ClCompile Include="SQRam.cpp" />
+    <ClCompile Include="WMIHelper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\susiaccess_handler_api.h" />
+    <ClInclude Include="..\..\Library3rdParty\SQFlash\include\SQFlash.h" />
+    <ClInclude Include="..\..\Library3rdParty\SUSI4\include\OsDeclarations.h" />
+    <ClInclude Include="HDDHandler.h" />
+    <ClInclude Include="HDDLog.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SQRam.h" />
+    <ClInclude Include="WMIHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\MonitoringHandler\ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

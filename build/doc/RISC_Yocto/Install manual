@@ -1,0 +1,42 @@
+WISE Agent How-To:
+
+A collection of tips and tricks for WISE Agent users
+===========================================================
+ * How to Install WISE Agent:
+===========================================================
+	1. Install SUSI4 driver and SUSI IoT Library depended by Hardware Monitor and SUSI Control handler
+         You need to refer to the SUSI 4 or SUSI IoT document.
+	2. $ ./wiseagent-platform_name-version.run
+	   The Agent is installed in "/usr/local/AgentService"
+	
+===========================================================
+ * How to Setup WISE Agent:
+===========================================================
+    1. Stop Agent: /etc/init.d/saagent stop
+	2. Modify config file: 
+	  $ cd /usr/local/AgentService
+	  $ ./setup.sh
+	3. Start Agent: /etc/init.d/saagent start
+	4. Agent Status check: : /etc/init.d/saagent status
+			
+===========================================================
+ * How to check WISE Agent configuration:
+===========================================================
+    1. Cat agent config file: 
+        # cat /usr/local/AgentService/agent_config.xml
+	
+===========================================================
+ * How to check WISE Agent connection status:
+===========================================================
+    1. Cat agent status file: 
+        # cat /usr/local/AgentService/agent_status
+		NOTICE:
+			0: disconnect
+			1: connected
+			
+===========================================================
+ * How to Uninstall WISE Agent:
+===========================================================
+	1. $ cd /usr/local/AgentService
+	2. $ ./uninstall.sh
+	

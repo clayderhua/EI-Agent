@@ -1,0 +1,9 @@
+LIBRARY "mcast-socket"
+
+EXPORTS
+	init_send_mcast_socket
+	init_recv_mcast_sockt
+	read_mcast_message
+	send_mcast_message
+	read_mcast_message_ex
+	send_mcast_message_ex

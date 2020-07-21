@@ -1,0 +1,8 @@
+LIBRARY "Log"
+
+EXPORTS
+	InitLog
+	UninitLog
+	ElsWriteLog
+	send2logd
+	PrintAndWriteLog

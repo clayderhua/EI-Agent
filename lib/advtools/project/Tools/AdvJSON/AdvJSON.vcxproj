@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{79807F33-330E-434F-83EF-E05F0C26AC41}</ProjectGuid>
+    <RootNamespace>AdvJSON</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27924.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\AdvJSON\inc;$(ProjectDir)..\..\..\AdvPlatform\include;$(ProjectDir)..\..\..\AdvPlatform\include\windows;$(ProjectDir)..\..\..\AdvCC\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ADVJSON_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\AdvJSON\inc;$(ProjectDir)..\..\..\AdvPlatform\include;$(ProjectDir)..\..\..\AdvPlatform\include\windows;$(ProjectDir)..\..\..\AdvCC\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USRDLL;ADVJSON_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\AdvJSON\src\AdvCJSON.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\AdvCollection.cpp" />
+    <ClCompile Include="..\..\..\AdvJSON\src\AdvJSON.cpp" />
+    <ClCompile Include="..\..\..\AdvJSON\src\AdvVariousType.cpp" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsoncollection.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsoncreator.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsonparser.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsonprint.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsonrule.c" />
+    <ClCompile Include="..\..\..\AdvJSON\src\jsontool.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvCollection.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvJSON.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvJSONCreator.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvJSONCreatorParallel.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvJSONParallel.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\AdvVariousType.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsoncollection.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsoncreator.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsonparser.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsonprint.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsonrule.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsontool.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\jsontype.h" />
+    <ClInclude Include="..\..\..\AdvJSON\inc\platform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AdvCC\AdvCC.vcxproj">
+      <Project>{8dece659-18a6-474e-959c-d9896b51e32d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AdvPlatform\AdvPlatform.vcxproj">
+      <Project>{f3aca332-bcc8-4f0e-8c42-afffe8257764}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

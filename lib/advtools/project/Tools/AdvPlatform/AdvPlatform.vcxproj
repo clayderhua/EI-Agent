@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F3ACA332-BCC8-4F0E-8C42-AFFFE8257764}</ProjectGuid>
+    <RootNamespace>AdvPlatform</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.27924.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PreBuildEvent>
+      <Command />
+    </PreBuildEvent>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\AdvPlatform\include\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;ADVPLAT_EXPORTS;ADVPLATFORM_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\AdvPlatform\include\windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;ADVPLAT_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\binding.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\dirent.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\dlfcn.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\getopt.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\pthread.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\ioctl.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\ipc.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\libgen.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\sem.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\shm.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\sysinfo.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\sys\time.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\termios.cpp" />
+    <ClCompile Include="..\..\..\AdvPlatform\src\windows\unistd.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\arpa\inet.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\binding.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\dirent.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\dlfcn.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\export.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\getopt.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\inttypes.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\libgen.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\pthread.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\stdbool.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\stdint.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\ioctl.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\ipc.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\sem.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\shm.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\sysinfo.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\sys\time.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\termios.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\unistd.h" />
+    <ClInclude Include="..\..\..\AdvPlatform\include\windows\wrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

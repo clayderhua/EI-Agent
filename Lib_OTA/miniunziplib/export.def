@@ -1,0 +1,5 @@
+LIBRARY  "MiniUnzipLib"
+
+EXPORTS
+	MiniUnzip
+	CheckZipComment

@@ -1,0 +1,1 @@
+../build-env/build-imx6.sh

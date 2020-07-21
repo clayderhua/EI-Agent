@@ -1,0 +1,17 @@
+LIBRARY "SUEClient"
+
+EXPORTS
+	SUECInit
+	SUECUninit
+	SUECStart
+	SUECStop
+	SUECSetOutputMsgCB
+	SUECSetTaskStatusCB
+	SUECSetDpCheckCB
+	SUECInputMsg
+	SUECSetOutputAct
+	SUECRequestDownload
+	SUECRequestDeploy
+	SUECGetErrMsg
+	SUEGetSysOS
+	SUEGetSysArch

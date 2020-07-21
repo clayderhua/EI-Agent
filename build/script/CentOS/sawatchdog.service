@@ -1,0 +1,15 @@
+[Unit]
+Description=RMM-Agent Watchdog
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/AgentService
+ExecStart=/usr/local/AgentService/sawatchdog
+ExecStop=/usr/bin/killall sawatchdog
+ExecStopPost=/bin/rm -f /var/run/SAWatchdog.pid
+TimeoutSec=5
+
+
+[Install]
+WantedBy=multi-user.target 

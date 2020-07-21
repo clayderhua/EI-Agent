@@ -1,0 +1,8 @@
+LIBRARY	"AdvLog"
+
+EXPORTS
+	AdvLog_Status
+	AdvLog_Print
+	AdvLog_PrintAndWrite
+	AdvLog_Write
+	AdvLog_ElsWrite

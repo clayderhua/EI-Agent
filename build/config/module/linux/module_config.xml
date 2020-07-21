@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<XMLConfigSettings><BaseSettings>
+<ModuleNum>15</ModuleNum>
+<ModuleName1>HDDHandler</ModuleName1><ModulePath1>module/HDDHandler.so</ModulePath1><ModuleEnable1>TRUE</ModuleEnable1>
+<ModuleName2>PowerOnOffHandler</ModuleName2><ModulePath2>module/PowerOnOffHandler.so</ModulePath2><ModuleEnable2>TRUE</ModuleEnable2>
+<ModuleName3>ScreenshotHandler</ModuleName3><ModulePath3>module/ScreenshotHandler.so</ModulePath3><ModuleEnable3>TRUE</ModuleEnable3>
+<ModuleName4>NetMonitorHandler</ModuleName4><ModulePath4>module/NetMonitorHandler.so</ModulePath4><ModuleEnable4>TRUE</ModuleEnable4>
+<ModuleName5>ProcessMonitorHandler</ModuleName5><ModulePath5>module/ProcessMonitorHandler.so</ModulePath5><ModuleEnable5>TRUE</ModuleEnable5>
+<ModuleName6>ProtectHandler</ModuleName6><ModulePath6>module/ProtectHandler.so</ModulePath6><ModuleEnable6>TRUE</ModuleEnable6>
+<ModuleName7>RecoveryHandler</ModuleName7><ModulePath7>module/RecoveryHandler.so</ModulePath7><ModuleEnable7>TRUE</ModuleEnable7>
+<ModuleName8>RemoteKVMHandler</ModuleName8><ModulePath8>module/RemoteKVMHandler.so</ModulePath8><ModuleEnable8>TRUE</ModuleEnable8>
+<ModuleName9>SUSIControlHandler</ModuleName9><ModulePath9>module/SUSIControlHandler.so</ModulePath9><ModuleEnable9>TRUE</ModuleEnable9>
+<ModuleName10>TerminalHandler</ModuleName10><ModulePath10>module/TerminalHandler.so</ModulePath10><ModuleEnable10>TRUE</ModuleEnable10>
+<ModuleName11>IoTGWHandler</ModuleName11><ModulePath11>module/IoTSensorHandler.so</ModulePath11><ModuleEnable11>TRUE</ModuleEnable11>
+<ModuleName12>Modbus_Handler</ModuleName12><ModulePath12>module/Modbus_Handler.so</ModulePath12><ModuleEnable12>FALSE</ModuleEnable12>
+<ModuleName13>OTAHandler</ModuleName13><ModulePath13>module/OTAHandler.so</ModulePath13><ModuleEnable13>TRUE</ModuleEnable13>
+<ModuleName14>ServiceHandler</ModuleName14><ModulePath14>module/ServiceHandler.so</ModulePath14><ModuleEnable14>TRUE</ModuleEnable14>
+<ModuleName15>HDDPMQ</ModuleName15><ModulePath15>module/HDDPMQ.so</ModulePath15><ModuleEnable15>FALSE</ModuleEnable15>
+<ModuleName16>LocalProvision</ModuleName16><ModulePath16>module/LocalProvision.so</ModulePath16><ModuleEnable16>TRUE</ModuleEnable16>
+</BaseSettings></XMLConfigSettings>

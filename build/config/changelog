@@ -1,0 +1,168 @@
+{
+  "Mark": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ],
+  "history": [
+    {
+      "version": "1.4.6",
+      "date": "Jun 24, 2020",
+      "descript": "1. Upgrade SQFlash to V3.1.15936.\n2. SUSIContorl increase auto-report command buffer size.\n3. Restart noVNC service after custom VNC port change\n4. Add ProcessExecute function in ProcessMonitor.\n5.HDDMonitor: rename Drive C: back to Disk C:.\n6. ProcessMonitor: fix Process Status while set EnableProcessStatus to true."
+    },
+    {
+      "version": "1.4.5",
+      "date": "Jun 16, 2020",
+      "descript": "1. Fix plugin autoreport fail.\n2. Add accumulation reconnect time delay\n3. SQFLashHelper: Get OPAL Status and Endurance only once at startup to prevent self-test interrupt.\n4. Fix windows installer problem."
+    },
+    {
+      "version": "1.4.4",
+      "date": "Jun 12, 2020",
+      "descript": "1. Fix file doesn't close problem to avoid log.ini is locked.\n2. Disable SUSI Check for UNO\n3. Add SQRam temperature range from -40 to 100.4. Fix OTA tags missing problem."
+    },
+    {
+      "version": "1.4.3",
+      "date": "Jun 1, 2020",
+      "descript": "1. Update DiskinfoLibrary to V8.4.1.\n2. Integrate new SQFlash API.\n3. Return error if OS not login in ubuntu18."
+    },
+    {
+      "version": "1.4.2",
+      "date": "Apr 14, 2020",
+      "descript": "1. agent.config add BundleServer URL support.\n2. DataSync add escape of single quote char for sqlite. \n3. Fix RuleEngine and IoTGW issue.\n4. Fix EmbIPC Hardware Watchdog issue."
+    },
+    {
+      "version": "1.4.1",
+      "date": "Apr 7, 2020",
+      "descript": "1. Add bundle server URL in server setting.\n2. Add error handle in liblog. \n3. Fix rule_engine back to normal.\n4. Fix ubuntu screenshot."
+    },
+    {
+      "version": "1.3.8",
+      "date": "Feb 26, 2020",
+      "descript": "1.  Support android build\n2. IAMT password encode.\n3. OTA fix agent service stop problem."
+    },
+    {
+      "version": "1.3.7",
+      "date": "Jan 20, 2020",
+      "descript": "1.  Support Centos7.6_x64 & Ubuntu18.04.\n2. Enable OTA sqlite WAL mode.\n3. Message array support live report."
+    },
+    {
+      "version": "1.3.6",
+      "date": "Jan 20, 2020",
+      "descript": "1.  Modify terminal handler for Ubuntu 18.04.\n2. Modify x11vnc command for CentOS.\n3. Fin tune download performance of OTA.\n4. Re-verify local provision plugin function."
+    },
+    {
+      "version": "1.3.5",
+      "date": "Jan 7, 2020",
+      "descript": "1.  Add the handler for process abnormal exiting.\n2. Fix api export issue."
+    },
+    {
+      "version": "1.3.4",
+      "date": "Dec 25, 2019",
+      "descript": "1.  Fix Plugins Capability.\n2. ProcessMonitor add info/ErrorMessageand info/ErrorCode into capability and report data for user login status.\n3. EmbIPC dynamic load SUSI library and WDT Switch switch to false if load SUSI failed.\n4. EmbIPC report capability after network re-connect.\n5. Fix OTA issues."
+    },
+    {
+      "version": "1.3.3",
+      "date": "Dec 12, 2019",
+      "descript": "1.  RuleEngine adds array data type support.\n2. RemoteKVMHandler adds RDP(rdpclip.exe) check.\n3. ProcessMonitor adds Parameters to switch on/off the active status report.\n4. Fix ProcessMonitor, SUSIContorl, NetMonitor, ServerConnection UI and WISEAgent Installer issues.\n5. EmbIPC canceled report status every 5 sec. only send once after changing the status from the remote server."
+    },
+    {
+      "version": "1.3.2",
+      "date": "Nov 15, 2019",
+      "descript": "1.  Fix RuleEngine capability issue for HDD_PMQ.\n2. Fix RemoteKVM connection without user login.\n3. Modify Agent ServerConnection UI OS Infomation format.\n4. Fix OTA issue.\n5. Modify AgentInstaller support list and only support Windows 7 SP1 and newer versions."
+    },
+    {
+      "version": "1.3.1",
+      "date": "Nov 7, 2019",
+      "descript": "1. Fix WISEAgent Upgrade issue\n2. Fix Plugins' capability and RuleEngine issue.\n3. Fix Remote KVM issue.\n 4. Fix OTA issue."
+    },
+    {
+      "version": "1.3.0",
+      "date": "Oct 25, 2019",
+      "descript": "1. Build with VisualStudio 2019\n2. Disable WISEAgentService auto-start after install.\n3. Fix bugs on EmbIPC, RemopteKVM, Protection, Recovery and RuleEngine"
+    },
+    {
+      "version": "1.2.17",
+      "date": "Oct 4, 2019",
+      "descript": "RISC Modify linux module_config.xml. \n"
+    },
+    {
+      "version": "1.2.16",
+      "date": "Oct 3, 2019",
+      "descript": "1. Modify memory management in dynamic library. \n2. Fix Agent reconnect issue.\n3. Fix OTA issue."
+    },
+	{
+      "version": "1.2.15",
+      "date": "Sep 16, 2019",
+      "descript": "1. Add TAG mechanism for OTA. \n2. Fix Process reset issue.\n3. Fix RuleEngine action trigger issue.\n4. Fix agent blocked at reconnect issue."
+    },
+    {
+      "version": "1.2.14",
+      "date": "Aug 16, 2019",
+      "descript": "1. Fix TerminalHandler garbled issue.\n2. HDDHandler add storage space Plug&Play Support.\n3. ProcessMonitor fix process Mem Usage issue.\n4. EmbIPC add Hardware Watchdog support.\n5. HDDMonitor add eMMC support.\n6. OTAHandler add TAG upgrade support."
+    },
+    {
+      "version": "1.2.13",
+      "date": "Aug 1, 2019",
+      "descript": "Rollback TerminalHandler for ipconfig garbled issue."
+    },
+    {
+      "version": "1.2.12",
+      "date": "Jul 31, 2019",
+      "descript": "1. Fix EmbIPC susi unibitialize issue.\n2. Fix TerminalHandler garbled issue."
+    },
+    {
+      "version": "1.2.11",
+      "date": "Jul 25, 2019",
+      "descript": "1. Fix EmbIPC windows notify issue.\n2. Modify Server Connection Account Setting page.\n3. Fix Process Monitor reset process."
+    },
+	{
+      "version": "1.2.10",
+      "date": "Jul 24, 2019",
+      "descript": "Fix EmbIPC blocked while system restart."
+    },
+	{
+      "version": "1.2.9",
+      "date": "Jul 18, 2019",
+      "descript": "1. Fix WISEAgent Configuration UI Issues.\n2. Fix EmbIPC Session ID Issue and disable Hardware Watchdog function."
+    },
+    {
+      "version": "1.2.8",
+      "date": "Jul 8, 2019",
+      "descript": "1. Modify the Server Connection User Interface.\n2. Fix Network report data.\n3. Fix Process restart on Ubuntu."
+    },
+    {
+      "version": "1.2.7",
+      "date": "Jun 28, 2019",
+      "descript": "Add new Server Connection User Interface."
+    },
+    {
+      "version": "1.2.6",
+      "date": "Jun 3, 2019",
+      "descript": "1. Migrate NetMonitor and Process Monitor to SRP-Plugin 1.2.11.\n2. Support RK3399-Debian"
+    },
+    {
+      "version": "1.2.5",
+      "date": "May 8, 2019",
+      "descript": "Disable Zero touch onboard as default."
+    },
+    {
+      "version": "1.2.4",
+      "date": "Apr 4, 2019",
+      "descript": "Fix the bug regarding memory leak."
+    },
+    {
+      "version": "1.2.3",
+      "date": "Apr 4, 2019",
+      "descript": "Fix the bug regarding memory leak."
+    }
+  ]
+}

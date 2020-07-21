@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{DDFCB738-9F9A-4F85-BC64-1604BD841AEC}</ProjectGuid>
+    <RootNamespace>SUEClientCore</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Library3rdParty\iniparser\inc;$(ProjectDir)..\..\Lib_OTA\miniunziplib\inc;$(ProjectDir)..\..\Lib_OTA\filetransferlib\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\lib\log\inc;$(ProjectDir)..\..\lib\listhelper\inc;$(ProjectDir)..\..\Platform\Windows;$(ProjectDir)..\..\Platform;$(ProjectDir)..\..\lib\xmlhelperlib\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Library3rdParty\iniparser\inc;$(ProjectDir)..\..\Lib_OTA\miniunziplib\inc;$(ProjectDir)..\..\Lib_OTA\filetransferlib\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\lib\log\inc;$(ProjectDir)..\..\lib\listhelper\inc;$(ProjectDir)..\..\Platform\Windows;$(ProjectDir)..\..\Platform;$(ProjectDir)..\..\lib\xmlhelperlib\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Library3rdParty\iniparser\iniparser.vcxproj">
+      <Project>{872ea565-ead3-4188-91b7-5ce70dfb278c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library3rdParty\sqlite\SQLite.vcxproj">
+      <Project>{7a6dd0aa-9e3a-4fa0-9e0d-2c4755dc2f3b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\base64\Base64.vcxproj">
+      <Project>{489a403e-10e5-49b2-8a45-6db64866448b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\des\DES.vcxproj">
+      <Project>{67656923-8cca-4b33-b645-13c0cda61d85}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\listhelper\listhelper.vcxproj">
+      <Project>{3cb71285-6bbe-4a07-b650-5a50557a7db7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\log\log.vcxproj">
+      <Project>{f7d10e10-1495-43de-8cd7-7f528e554508}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\md5\MD5.vcxproj">
+      <Project>{aa41efd7-6ae4-4d5b-96ca-4907bf9b0ccc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\xmlhelperlib\XmlHelperLib.vcxproj">
+      <Project>{81f142e6-fb61-4f66-b8ce-422c7cce4fb6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\WISEPlatform.vcxproj">
+      <Project>{c28b0ed4-d61c-4a16-9a2e-8b65ea726069}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\WISEUtil.vcxproj">
+      <Project>{b03503d0-8410-4fc4-a7e4-a318de24cb4c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\filetransferlib\FileTransferLib.vcxproj">
+      <Project>{3aeba44d-01ea-4510-8405-9d4581a8cc04}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\MiniUnzipLib\MiniUnzipLib.vcxproj">
+      <Project>{49c50b2c-26f4-4125-afc1-af4d64b07a3a}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\cp_fun.c" />
+    <ClCompile Include="src\ErrorDef.c" />
+    <ClCompile Include="src\PackageLogParser.c" />
+    <ClCompile Include="src\PkgParams.c" />
+    <ClCompile Include="src\SUECDBAccess.c" />
+    <ClCompile Include="src\SUEClientCore.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Makefile.am" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\cp_fun.h" />
+    <ClInclude Include="inc\InternalData.h" />
+    <ClInclude Include="inc\PackageLogParser.h" />
+    <ClInclude Include="inc\PkgParams.h" />
+    <ClInclude Include="inc\resource.h" />
+    <ClInclude Include="inc\SUECDBAccess.h" />
+    <ClInclude Include="inc\SUEClientCore.h" />
+    <ClInclude Include="inc\SUEClientCoreData.h" />
+    <ClInclude Include="resource1.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SUEClientCore.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

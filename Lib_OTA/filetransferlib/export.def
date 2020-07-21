@@ -1,0 +1,11 @@
+
+LIBRARY "FileTransferLib"
+
+EXPORTS
+	FTGlobalInit
+	FTGlobalCleanup
+	FTNewHandle
+	FTCloseHandle
+	FTSet
+	FTDownload
+	FTAbortTransfer

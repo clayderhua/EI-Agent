@@ -1,0 +1,11 @@
+LIBRARY	"SAGeneralHandler"
+
+EXPORTS
+	General_Initialize
+	General_Uninitialize
+	General_HandleRecv
+	General_SetProfile
+	General_SetPluginHandlers
+	General_OnStatusChange
+	General_Start
+	General_Stop

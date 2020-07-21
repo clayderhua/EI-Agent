@@ -1,0 +1,1 @@
+../build-env/build-rk3399.sh

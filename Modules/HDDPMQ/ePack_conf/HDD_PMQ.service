@@ -1,0 +1,17 @@
+[Unit]
+Description=HDD_PMQ Service
+After=network.target systemd-sysctl.service systemd-modules-load.service
+
+[Service]
+WorkingDirectory=/usr/local/EdgeSense/HDD_PMQ
+ExecStart=/usr/local/EdgeSense/HDD_PMQ/Agent_HDD_PMQ
+Restart=no
+#RestartSec=30s
+#WatchdogSec=10s
+#Watchdog=1
+ExecStopPost=/bin/rm -f /var/run/Agent_HDD_PMQ.pid
+Type=simple
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target

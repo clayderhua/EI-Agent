@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-IoTCore|Win32">
+      <Configuration>Debug-IoTCore</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-IoTCore|Win32">
+      <Configuration>Release-IoTCore</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3CD49B81-7115-427E-A3BD-E68B3487D6BD}</ProjectGuid>
+    <RootNamespace>RecoveryHandler</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LibraryPath>$(VCInstallDir)lib\onecore;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LibraryPath>$(VCInstallDir)lib\onecore;$(WindowsSDK_LibraryPath_x86);$(UniversalCRT_LibraryPath_x86)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\\Library3rdParty\curl-7.37.1\include\curl;$(ProjectDir)..\..\lib\ftphelper\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Lib_SRP\SAConfig;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\Old_Platforms\Windows;$(ProjectDir)..\..\\Include;$(ProjectDir)..\..\lib\log\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies);version.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)..\..\Modules\RecoveryHandler\*.exe"  $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-IoTCore|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\\Library3rdParty\curl-7.37.1\include\curl;$(ProjectDir)..\..\lib\ftphelper\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Lib_SRP\SAConfig;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\Old_Platforms\Windows;$(ProjectDir)..\..\\Include;$(ProjectDir)..\..\lib\log\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)..\..\Modules\RecoveryHandler\*.exe"  $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\\Library3rdParty\curl-7.37.1\include\curl;$(ProjectDir)..\..\lib\ftphelper\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Lib_SRP\SAConfig;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\Old_Platforms\Windows;$(ProjectDir)..\..\\Include;$(ProjectDir)..\..\lib\log\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);version.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)..\..\Modules\RecoveryHandler\*.exe"  $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-IoTCore|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\Library3rdParty\libxml2\Windows\include;$(ProjectDir)..\..\\Library3rdParty\curl-7.37.1\include\curl;$(ProjectDir)..\..\lib\ftphelper\inc;$(ProjectDir)..\..\lib\des\inc;$(ProjectDir)..\..\lib\base64\inc;$(ProjectDir)..\..\lib\md5\inc;$(ProjectDir)..\..\Library3rdParty\sqlite\inc;$(ProjectDir)..\..\Lib_SRP\SAConfig;$(ProjectDir)..\..\Library3rdParty\cjson\inc;$(ProjectDir)..\..\Old_Platforms\Windows;$(ProjectDir)..\..\\Include;$(ProjectDir)..\..\lib\log\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)module\$(ProjectName).dll</OutputFile>
+      <ModuleDefinitionFile>export.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy "$(ProjectDir)..\..\Modules\RecoveryHandler\*.exe"  $(OutDir)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Old_Platforms\Windows\common.c" />
+    <ClCompile Include="..\..\Old_Platforms\Windows\platform.c" />
+    <ClCompile Include="activate_rcvy.c" />
+    <ClCompile Include="asz_rcvy.c" />
+    <ClCompile Include="backup_rcvy.c" />
+    <ClCompile Include="capability_rcvy.c" />
+    <ClCompile Include="install_update_rcvy.c" />
+    <ClCompile Include="parser_rcvy.c" />
+    <ClCompile Include="public_rcvy.c" />
+    <ClCompile Include="RecoveryHandler.c" />
+    <ClCompile Include="restore_rcvy.c" />
+    <ClCompile Include="status_rcvy.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Include\susiaccess_handler_api.h" />
+    <ClInclude Include="..\..\Old_Platforms\Windows\common.h" />
+    <ClInclude Include="..\..\Old_Platforms\Windows\platform.h" />
+    <ClInclude Include="activate_rcvy.h" />
+    <ClInclude Include="asz_rcvy.h" />
+    <ClInclude Include="backup_rcvy.h" />
+    <ClInclude Include="capability_rcvy.h" />
+    <ClInclude Include="install_update_rcvy.h" />
+    <ClInclude Include="parser_rcvy.h" />
+    <ClInclude Include="public_rcvy.h" />
+    <ClInclude Include="RecoveryHandler.h" />
+    <ClInclude Include="RecoveryLog.h" />
+    <ClInclude Include="restore_rcvy.h" />
+    <ClInclude Include="status_rcvy.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="export.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Library3rdParty\curl\projects\Windows\VC14\lib\libcurl.vcxproj">
+      <Project>{da6f56b4-06a4-441d-ad70-ac5a7d51fadb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library3rdParty\sqlite\sqlite.vcxproj">
+      <Project>{7a6dd0aa-9e3a-4fa0-9e0d-2c4755dc2f3b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lib_SRP\SAConfig\SAConfig.vcxproj">
+      <Project>{3a8e7d4f-46d7-4000-a910-3d0094df18c2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lib_SRP\SAHandlerLoader\SAHandlerLoader.vcxproj">
+      <Project>{0b7676e1-4fad-4f60-920a-a6f87c2c0c5b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\base64\base64.vcxproj">
+      <Project>{489a403e-10e5-49b2-8a45-6db64866448b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Library3rdParty\cjson\cjson.vcxproj">
+      <Project>{c15929aa-2406-4764-842f-839e6b3f17fc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\des\des.vcxproj">
+      <Project>{67656923-8cca-4b33-b645-13c0cda61d85}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\ftphelper\ftphelper.vcxproj">
+      <Project>{8e375e7a-9a5e-4fea-971a-96aca3257505}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\log\log.vcxproj">
+      <Project>{d807f1c9-38ad-44d1-8543-d2fb7808717e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\md5\md5.vcxproj">
+      <Project>{aa41efd7-6ae4-4d5b-96ca-4907bf9b0ccc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Platform\WISEPlatform.vcxproj">
+      <Project>{c28b0ed4-d61c-4a16-9a2e-8b65ea726069}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

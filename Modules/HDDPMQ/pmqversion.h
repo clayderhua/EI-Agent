@@ -1,0 +1,4 @@
+#define MAIN_VERSION	1
+#define SUB_VERSION		0
+#define BUILD_VERSION	2
+#define SVN_REVISION	0

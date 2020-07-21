@@ -1,0 +1,9 @@
+LIBRARY "simple-tcp-socket"
+
+EXPORTS
+	init_server_tcp_socket
+	init_client_tcp_socket
+	send_tcp_message
+	read_tcp_message
+	send_tcp_message_ex
+	read_tcp_message_ex

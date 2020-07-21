@@ -1,0 +1,10 @@
+ecgwc/db410c-build-rmm
+	RISC_Yocto-yocto-qualcomm_dragon
+ecgwc/rk3288-build-rmm
+	RISC_Debian-debian-rk_3288
+ecgwc/debian-build-rmm
+	RISC_Debian-debian-rk_3399
+ecgwc/yocto-build-rmm
+	RISC_Yocto-yocto-fsl_imx6
+ecgwc/openwrt-build-rmm
+	RISC_Yocto-yocto-wise_openwrt

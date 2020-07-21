@@ -1,0 +1,1286 @@
+#include "SAManager.h"
+#include "hlloader.h"
+#include "ghloader.h"
+#include "pktparser.h"
+#include <cJSON.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include "SAManagerLog.h"
+#include "topic.h"
+#include "keepalive.h"
+#include <pthread.h>
+#include "basequeue.h"
+#include "util_path.h"
+#include "util_string.h"
+#include "reloader.h"
+#include "SADataSync.h"
+#include "sys/time.h"
+
+#define general_info_spec_rep			2052
+#define general_info_upload_rep			2055
+#define general_event_notify_rep		2059
+
+SALoader_Interface* g_pSALoader = NULL;
+SAGeneral_Interface* g_SAGeneral = NULL;
+SADataSync_Interface* g_SADataSync = NULL;
+RuleEngine_Interface* g_RuleEngine = NULL;
+
+Handler_List_t g_handlerList;
+PUBLISHCB g_publishCB = NULL;
+SUBSCRIBECB g_subscribeCB = NULL;
+UNSUBSCRIBECB g_unsubscribeCB = NULL;
+CONNECTSERVERCB g_connectserverCB = NULL;
+DISCONNECTCB g_disconnectCB = NULL;
+int g_iConnStatus = 1;
+LOGHANDLE g_samanagerlogger = NULL;
+
+susiaccess_agent_conf_body_t * g_pConfig = NULL;
+susiaccess_agent_profile_body_t * g_pProfile = NULL;
+
+static unsigned long long g_ullDataFlowSeq = 0; //8 bytes, 0 ~ 18,446,744,073,709,551,615
+bool g_bUninitialized = false;
+
+#ifdef _MSC_VER
+BOOL WINAPI DllMain(HINSTANCE module_handle, DWORD reason_for_call, LPVOID reserved)
+{
+	if (reason_for_call == DLL_PROCESS_ATTACH) // Self-explanatory
+	{
+		//printf("DllInitializer\n");
+		DisableThreadLibraryCalls(module_handle); // Disable DllMain calls for DLL_THREAD_*
+		if (reserved == NULL) // Dynamic load
+		{
+			// Initialize your stuff or whatever
+			// Return FALSE if you don't want your module to be dynamically loaded
+		}
+		else // Static load
+		{
+			// Return FALSE if you don't want your module to be statically loaded
+		}
+	}
+
+	if (reason_for_call == DLL_PROCESS_DETACH) // Self-explanatory
+	{
+		//printf("DllFinalizer\n");
+		if (reserved == NULL) // Either loading the DLL has failed or FreeLibrary was called
+		{
+			// Cleanup
+			SAManager_Uninitialize();
+		}
+		else // Process is terminating
+		{
+			// Cleanup
+			SAManager_Uninitialize();
+		}
+	}
+	return TRUE;
+}
+#else
+__attribute__((constructor))
+/**
+ * initializer of the shared lib.
+ */
+static void Initializer(int argc, char** argv, char** envp)
+{
+	fprintf(stderr, "[SAManager] DllInitializer\n");
+}
+
+__attribute__((destructor))
+/** 
+ * It is called when shared lib is being unloaded.
+ * 
+ */
+static void Finalizer()
+{
+    fprintf(stderr, "[SAManager] DllFinalizer\n");
+	SAManager_Uninitialize();
+}
+#endif
+
+void GetDateTime(char* time_string)
+{
+	//char buff[256] = {0};
+	struct timeval tv;
+	struct tm* ptm;
+	char temp_string[100] = {0};
+	long milliseconds;
+	time_t t1;
+
+
+	gettimeofday(&tv, NULL);
+	t1 = tv.tv_sec;
+	milliseconds = tv.tv_usec / 1000;
+
+	ptm = gmtime(&t1);
+	strftime(temp_string, sizeof (temp_string), "%Y-%m-%dT%H:%M:%S", ptm);
+	sprintf(time_string, "%s.%03ld", temp_string, milliseconds);
+}
+
+char * ConvertMessageToUTF8(char* wText)
+{
+	char * utf8RetStr = NULL;
+	int tmpLen = 0;
+	if(!wText)
+		return utf8RetStr;
+	if(!IsUTF8(wText))
+	{
+		utf8RetStr = ANSIToUTF8(wText);
+		tmpLen = !utf8RetStr ? 0 : strlen(utf8RetStr);
+		if(tmpLen == 1)
+		{
+			if(utf8RetStr) free(utf8RetStr);
+			utf8RetStr = UnicodeToUTF8((wchar_t *)wText);
+		}
+	}
+	else
+	{
+		tmpLen = strlen(wText)+1;
+		utf8RetStr = (char *)malloc(tmpLen);
+		memcpy(utf8RetStr, wText, tmpLen);
+	}
+	return utf8RetStr;
+}
+
+void SAManager_InsertOPTSNode(cJSON* handler)
+{
+	cJSON* oproot = NULL;
+	if(handler == NULL)
+		return;
+	oproot = cJSON_CreateObject();
+	if(oproot)
+	{
+		long long tick = 0;
+		{
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			tick = (long long)tv.tv_sec*1000 + (long long)tv.tv_usec/1000;
+	    }
+		cJSON_AddNumberToObject(oproot,"$date", tick);
+
+		if(handler)
+		{
+			cJSON* opts = cJSON_GetObjectItem(handler, "opTS");
+			if(opts == NULL)
+				cJSON_AddItemToObject(handler,"opTS", cJSON_Duplicate(oproot, true));
+		}
+
+		cJSON_Delete(oproot);
+	}
+}
+
+void SAManager_InsertDataFlowNode(cJSON* handler, Handler_info const * plugin)
+{
+	char flow[256] = {0};
+	long long tick = 0;
+	if(plugin == NULL)
+		return;
+	sprintf(flow, "%s/%s", plugin->Name, plugin->agentInfo->devId);
+	
+	if(handler == NULL)
+		return;
+	if(handler)
+	{
+		char seq[256] = {0};
+		long long tick = 0;
+		char* newflow;
+
+		cJSON* seqnode = NULL;
+		cJSON* srctsnode = NULL;
+		cJSON *dfnode = cJSON_GetObjectItem(handler, "dataFlow");
+		if(dfnode == NULL)
+		{
+			cJSON* seqnode = NULL;
+			cJSON_AddStringToObject(handler,"dataFlow", flow);
+			newflow = strdup(flow);
+			seqnode = cJSON_GetObjectItem(handler, "seq");
+			if(seqnode == NULL)
+			{
+				{
+					struct timeval tv;
+					gettimeofday(&tv, NULL);
+					tick = (long long)tv.tv_sec*1000 + (long long)tv.tv_usec/1000;
+				}
+				sprintf(seq, "%llu_%llu",g_ullDataFlowSeq++, tick);
+				cJSON_AddStringToObject(handler,"seq", seq);
+			}
+		}
+		else
+		{
+			long length = strlen(dfnode->valuestring)+strlen(plugin->Name)+strlen(plugin->agentInfo->devId)+16;
+			newflow = (char*)calloc(1, length);
+			if(strstr(dfnode->valuestring, plugin->Name) == 0)
+				sprintf(newflow, "%s/%s",dfnode->valuestring, flow);
+			else
+				sprintf(newflow, "%s/%s",dfnode->valuestring, plugin->agentInfo->devId);
+			cJSON_DeleteItemFromObject(handler, "dataFlow");
+			cJSON_AddStringToObject(handler,"dataFlow", newflow);
+			//free(newflow);
+		}
+
+		{
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			tick = (long long)tv.tv_sec*1000 + (long long)tv.tv_usec/1000;
+		}
+
+		seqnode = cJSON_GetObjectItem(handler, "seq");
+		if(seqnode == NULL)
+		{			
+			sprintf(seq, "%llu_%llu",g_ullDataFlowSeq++, tick);
+			cJSON_AddStringToObject(handler,"seq", seq);
+		}
+
+		srctsnode = cJSON_GetObjectItem(handler, "srcTs");
+		if(srctsnode == NULL)
+		{
+			cJSON_AddNumberToObject(handler,"srcTs", tick);
+		}
+		else
+			tick = srctsnode->valuedouble;
+		if(newflow)
+		{
+			char jsonLogFormat[1024] = { "{\"date\":\"%s\", \"node\":\"%s\", \"handler\":\"%s\", \"type\":\"UpdateData\", \"seq\":\"%s\", \"srcTs\":%llu, \"dataFlow\":\"%s\", \"reserved\":\"\"}" };
+			char jsonLogString[1024] = { 0 };
+			char jsonLogResult[1024] = { 0 };
+			char strDateTime[100] = { 0 };
+			char tableName[512] = { "/" };
+			char* locEnd;
+
+			GetDateTime(strDateTime);
+			sprintf(jsonLogString, jsonLogFormat, strDateTime, plugin->agentInfo->devId, handler->string==NULL?plugin->Name:handler->string, seq, tick, newflow);
+
+			locEnd = strchr(newflow, '/');
+			if(locEnd > newflow)
+			{
+				strncat(tableName, newflow, locEnd-newflow);
+				//strncpy(tableName, newflow, locEnd-newflow);
+			}
+			else
+			{
+				strcat(tableName, newflow);
+				//strcpy(tableName, newflow );
+			}
+
+			strcat(tableName, "/logs");
+			strcat(tableName, "/");
+			strcat(tableName, seq);
+
+			//printf("\r\nWrite DataFlow Log ...\r\n");
+			//printf("TableName = [%s], JSON = [%s]\r\n", tableName, jsonLogString);
+
+			SAManagerDataFlowLog(tableName, jsonLogString, sizeof(jsonLogString));
+
+			free(newflow);
+		}
+		
+	}
+	if(g_ullDataFlowSeq > 18000000000000000000)
+		g_ullDataFlowSeq = 0;
+
+}
+
+susiaccess_packet_body_t*  SAManager_WrapReqPacket(Handler_info const * plugin, int const enum_act, void const * const requestData, unsigned int const requestLen, bool bCust)
+{
+	susiaccess_packet_body_t* packet = NULL;
+	bool bIsCust = false;
+
+	if(plugin == NULL)
+	{
+		if(requestData == NULL)
+			return packet;
+		else
+			bIsCust = true;
+	}
+	else 
+	{
+		if(plugin->agentInfo == NULL)
+			return packet;
+	}
+
+	packet = malloc(sizeof(susiaccess_packet_body_t));
+	memset(packet, 0, sizeof(susiaccess_packet_body_t));
+	packet->type = pkt_type_wisepaas;
+
+	if(requestData)
+	{
+		char* data = ConvertMessageToUTF8((char*)requestData);
+		cJSON* root = cJSON_Parse((const char *)data);
+		free(data);
+		if(root)
+		{
+			char* buff = 0;
+			SAManager_InsertDataFlowNode(root,plugin);
+			buff = cJSON_PrintUnformatted(root);
+			cJSON_Delete(root);
+			packet->content = (char*)calloc(1, strlen(buff)+1);
+			if(packet->content)
+			{
+				memcpy(packet->content, buff, strlen(buff));
+			}
+			free(buff);
+		}
+	}
+
+	if(bIsCust)
+	{
+		packet->type = pkt_type_custom;
+		return packet;
+	}
+	if(plugin)
+	{
+		if(plugin->agentInfo)
+			strcpy(packet->devId, plugin->agentInfo->devId);
+		strcpy(packet->handlerName, plugin->Name);
+	}
+
+	packet->cmd = enum_act;
+	return packet;
+}
+
+AGENT_SEND_STATUS SAManager_SendMessage( HANDLE const handle, int enum_act, 
+									   void const * const requestData, unsigned int const requestLen, 
+									   void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+	Handler_info* plugin = NULL;
+	susiaccess_packet_body_t* packet = NULL;
+	char topicStr[128] = {0};
+
+	if(g_bUninitialized)
+		return result;
+
+	if(handle == NULL)
+		return result;
+
+	plugin = (Handler_info*)handle;
+
+	if(plugin->agentInfo == NULL)
+		return result;
+
+	packet = SAManager_WrapReqPacket(plugin, enum_act, requestData, requestLen, false);
+
+	if(packet == NULL)
+	{
+		SAManagerLog(g_samanagerlogger, Warning, "Request Packet is empty!");
+		return result;
+	}
+#ifdef RMM3X
+	sprintf(topicStr, DEF_AGENTACT_TOPIC, plugin->agentInfo->devId);
+#else
+	sprintf(topicStr, DEF_AGENTACT_TOPIC, plugin->agentInfo->productId, plugin->agentInfo->devId);
+#endif
+	if(g_publishCB)
+	{
+		if(g_publishCB(topicStr, 0, 0, packet) == 0)
+			result = cagent_success;
+		else
+			result = cagent_send_data_error;
+	}
+	else
+		result = cagent_callback_null;
+
+	if(packet->content)
+		free(packet->content);
+	free(packet);
+	return result;
+}
+
+AGENT_SEND_STATUS SAManager_SendCustMessage( HANDLE const handle, int enum_act, char const * const topic, 
+										   void const * const requestData, unsigned int const requestLen, 
+										   void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+	Handler_info* plugin = NULL;
+	susiaccess_packet_body_t* packet = NULL;
+
+	//SAManagerLog(g_samanagerlogger, Normal, "Topic: %s, Data: %s", topic, requestData);
+	//if(handle == NULL)
+	//	return result;
+	if(g_bUninitialized)
+		return result;
+
+	if(handle)
+		plugin = (Handler_info*)handle;
+
+	//if(plugin->agentInfo == NULL)
+	//	return result;
+
+	packet = SAManager_WrapReqPacket(plugin, enum_act, requestData, requestLen, true);
+
+	if(packet == NULL)
+	{
+		SAManagerLog(g_samanagerlogger, Warning, "Request Packet is empty!");
+		return result;
+	}
+
+	if(g_publishCB)
+	{
+		if(g_publishCB(topic, 0, 0, packet) == 0)
+			result = cagent_success;
+		else
+			result = cagent_send_data_error;
+	}
+	else
+		result = cagent_callback_null;
+	if(packet->content)
+		free(packet->content);
+	free(packet);
+	return result;
+}
+
+susiaccess_packet_body_t * SAManager_WrapAutoReportPacket(Handler_info const * plugin, void const * const requestData, unsigned int const requestLen, bool bCust)
+{
+	susiaccess_packet_body_t* packet = NULL;
+
+	cJSON* node = NULL;
+	cJSON* root = NULL;
+	char* buff = NULL;
+	char* data = NULL;
+	int length = 0;
+
+	if(plugin == NULL)
+		return packet;
+	if(plugin->agentInfo == NULL)
+		return packet;
+
+	if(requestData)
+	{
+		data = ConvertMessageToUTF8((char*)requestData);
+	}
+	else
+		return packet;
+
+	//root = cJSON_CreateObject();
+	//node = cJSON_Parse((const char *)requestData);
+	node = cJSON_Parse((const char *)data);
+	free(data);
+	
+	if(node)
+	{
+#ifdef RMM3X
+		root = cJSON_CreateObject();
+		cJSON_AddItemToObject(root, "data", cJSON_Duplicate(node, true));
+#else
+		root = cJSON_Duplicate(node, true);
+#endif
+		cJSON_Delete(node);
+	}
+	else
+		root = cJSON_CreateObject();
+
+	if(root)
+	{
+		cJSON* handler = root->child;
+		while(handler)
+		{
+			SAManager_InsertOPTSNode(handler);
+			SAManager_InsertDataFlowNode(handler,plugin);
+			handler = handler->next;
+		}
+	}
+	buff = cJSON_PrintUnformatted(root);
+	cJSON_Delete(root);
+	length = strlen(buff);
+	
+	packet = malloc(sizeof(susiaccess_packet_body_t));
+	memset(packet, 0, sizeof(susiaccess_packet_body_t));
+	packet->type = pkt_type_wisepaas;
+	packet->content = (char*)malloc(length+1);
+	memset(packet->content, 0, length+1);
+	memcpy(packet->content, buff, length);
+
+	free(buff);
+
+	strcpy(packet->devId, plugin->agentInfo->devId);
+	strcpy(packet->handlerName, "general");  //Special case for auto report.
+
+	packet->cmd = general_info_upload_rep;
+	//SAManagerLog(g_samanagerlogger, Normal, "Parser_CreateRequestInfo");
+
+	return packet;
+}
+
+AGENT_SEND_STATUS SAManager_SendAutoReport( HANDLE const handle, 
+										  void const * const requestData, unsigned int const requestLen, 
+										  void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+	Handler_info* plugin = NULL;
+	susiaccess_packet_body_t* packet = NULL;
+	char topicStr[128] = {0};
+
+	if(g_bUninitialized)
+		return result;
+
+	if(handle == NULL)
+		return result;
+
+	plugin = (Handler_info*)handle;
+
+	if(plugin->agentInfo == NULL)
+		return result;
+
+	packet = SAManager_WrapAutoReportPacket(plugin, requestData, requestLen, false);
+
+	if(packet == NULL)
+	{
+		SAManagerLog(g_samanagerlogger, Warning, "Request Packet is empty!");
+		return result;
+	}
+
+	sprintf(topicStr, DEF_AGENTREPORT_TOPIC, plugin->agentInfo->devId);
+
+
+	if(g_publishCB)
+	{
+		if(g_publishCB(topicStr, 0, 0, packet) == 0)
+			result = cagent_success;
+		else
+			result = cagent_send_data_error;
+	}
+	else
+		result = cagent_callback_null;
+
+	reloader_data_recv(g_RuleEngine, handle, requestData, requestLen);
+
+	if(g_SADataSync)
+		if(g_SADataSync->DataSync_Insert_Data_API)
+			g_SADataSync->DataSync_Insert_Data_API(handle,packet->content,topicStr, general_info_upload_rep);
+
+	if(packet->content)
+		free(packet->content);
+	free(packet);
+	return result;
+}
+
+AGENT_SEND_STATUS SAManager_InternelReport( HANDLE const handle, 
+										  void const * const requestData, unsigned int const requestLen, 
+										  void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+
+	if(g_bUninitialized)
+		return result;
+
+	if(handle == NULL)
+		return result;
+
+	reloader_data_recv(g_RuleEngine, handle, requestData, requestLen);
+
+	result = cagent_success;
+	return result;
+}
+
+
+susiaccess_packet_body_t * SAManager_WrapCapabilityPacket(Handler_info const * plugin, void const * const requestData, unsigned int const requestLen, bool bCust)
+{
+	susiaccess_packet_body_t* packet = NULL;
+
+	cJSON* node = NULL;
+	cJSON* root = NULL;
+	char* buff = NULL;
+	char* data = NULL;
+	int length = 0;
+
+	if(plugin == NULL)
+		return packet;
+	if(plugin->agentInfo == NULL)
+		return packet;
+
+	if(requestData)
+	{
+		data = ConvertMessageToUTF8((char*)requestData);
+	}
+	else
+		return packet;
+
+	//root = cJSON_CreateObject();
+	node = cJSON_Parse((const char *)data);
+	free(data);
+	if(node)
+	{
+#ifdef RMM3X
+		root = cJSON_CreateObject();
+		cJSON_AddItemToObject(root, "infoSpec", cJSON_Duplicate(node, true));
+#else
+		root = cJSON_Duplicate(node, true);
+#endif
+		cJSON_Delete(node);
+	}
+	else
+		root = cJSON_CreateObject();
+	
+	if(root)
+	{
+		cJSON* handler = root->child;
+		while(handler)
+		{
+			SAManager_InsertOPTSNode(handler);
+			SAManager_InsertDataFlowNode(handler,plugin);
+			handler = handler->next;
+		}		
+	}
+
+	buff = cJSON_PrintUnformatted(root);
+	cJSON_Delete(root);
+	length = strlen(buff);
+
+	packet = malloc(sizeof(susiaccess_packet_body_t));
+	memset(packet, 0, sizeof(susiaccess_packet_body_t));
+	packet->type = pkt_type_wisepaas;
+	packet->content = (char*)malloc(length+1);
+	memset(packet->content, 0, length+1);
+	memcpy(packet->content, buff, length);
+
+	free(buff);
+
+	strcpy(packet->devId, plugin->agentInfo->devId);
+	strcpy(packet->handlerName, "general");  //Special case for auto report.
+
+	packet->cmd = general_info_spec_rep;
+	//SAManagerLog(g_samanagerlogger, Normal, "Parser_CreateRequestInfo");
+
+	return packet;
+}
+
+AGENT_SEND_STATUS SAManager_SendCapability( HANDLE const handle, 
+										 void const * const requestData, unsigned int const requestLen, 
+										 void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+	Handler_info* plugin = NULL;
+	susiaccess_packet_body_t* packet = NULL;
+	char topicStr[128] = {0};
+
+	if(g_bUninitialized)
+		return result;
+
+	if(handle == NULL)
+		return result;
+
+	plugin = (Handler_info*)handle;
+
+	if(plugin->agentInfo == NULL)
+		return result;
+
+	reloader_capability_recv(g_RuleEngine, handle, requestData, requestLen);
+	
+	packet = SAManager_WrapCapabilityPacket(handle, requestData, requestLen, false);
+
+	if(packet == NULL)
+	{
+		SAManagerLog(g_samanagerlogger, Warning, "Request Packet is empty!");
+		return result;
+	}
+#ifdef RMM3X
+	sprintf(topicStr, DEF_AGENTACT_TOPIC, plugin->agentInfo->devId);
+#else
+	sprintf(topicStr, DEF_AGENTACT_TOPIC, plugin->agentInfo->productId, plugin->agentInfo->devId);
+#endif
+	if(g_publishCB)
+	{
+		if(g_publishCB(topicStr, 0, 0, packet) == 0)
+			result = cagent_success;
+		else
+			result = cagent_send_data_error;
+	}
+	else
+		result = cagent_callback_null;
+	if(g_SADataSync)
+		if(g_SADataSync->DataSync_Insert_Cap_API)
+			g_SADataSync->DataSync_Insert_Cap_API(handle,packet->content,topicStr, result);
+
+	if(packet->content)
+		free(packet->content);
+	free(packet);
+
+	return result;
+}
+
+susiaccess_packet_body_t * SAManager_WrapEventNotifyPacket(Handler_info const * plugin, HANDLER_NOTIFY_SEVERITY severity, void const * const requestData, unsigned int const requestLen, bool bCust)
+{
+	char* data = NULL; 
+	susiaccess_packet_body_t* packet = NULL;
+	cJSON* oproot = NULL;
+	cJSON* node = NULL;
+	cJSON* root = NULL;
+	cJSON* pfinfoNode = NULL;
+	char* buff = NULL;
+	int length = 0;
+
+	if(plugin == NULL)
+		return packet;
+	if(plugin->agentInfo == NULL)
+		return packet;
+
+	if(requestData)
+	{
+		data = ConvertMessageToUTF8((char*)requestData);
+	}
+	else
+		return packet;
+
+	root = cJSON_CreateObject();
+	pfinfoNode = cJSON_CreateObject();
+	//node = cJSON_Parse((const char *)requestData);
+	if(data)
+	{
+		node = cJSON_Parse((const char *)data);
+		free(data);
+	}
+	
+	if(node)
+	{
+		cJSON* pNode = NULL;
+		cJSON* chNode = node->child;
+		while(chNode)
+		{
+			if(strcmp(chNode->string,"opTS")==0)
+				oproot = cJSON_Duplicate(chNode, true);
+			else
+				cJSON_AddItemToObject(pfinfoNode, chNode->string, cJSON_Duplicate(chNode, true));	
+			chNode = chNode->next;
+		}
+		pNode = cJSON_GetObjectItem(pfinfoNode, "severity");
+		if(pNode == NULL)
+			cJSON_AddNumberToObject(pfinfoNode, "severity", severity);
+
+		pNode = cJSON_GetObjectItem(pfinfoNode, "handler");
+		if(pNode == NULL)
+			cJSON_AddStringToObject(pfinfoNode, "handler", plugin->Name);
+
+		cJSON_Delete(node);
+	}
+
+	cJSON_AddItemToObject(root, "eventnotify", pfinfoNode);	
+	
+	if(oproot)
+	{
+		cJSON_AddItemToObject(root,"opTS", oproot);
+	}
+	else
+	{
+		SAManager_InsertOPTSNode(root);
+	}
+	SAManager_InsertDataFlowNode(root,plugin);
+
+	buff = cJSON_PrintUnformatted(root);
+	cJSON_Delete(root);
+	length = strlen(buff);
+
+	packet = malloc(sizeof(susiaccess_packet_body_t));
+	memset(packet, 0, sizeof(susiaccess_packet_body_t));
+	packet->type = pkt_type_wisepaas;
+	packet->content = (char*)malloc(length+1);
+	memset(packet->content, 0, length+1);
+	memcpy(packet->content, buff, length);
+
+	free(buff);
+
+	strcpy(packet->devId, plugin->agentInfo->devId);
+	strcpy(packet->handlerName, "general");  //Special case for event notify.
+
+	packet->cmd = general_event_notify_rep;
+	//SAManagerLog(g_samanagerlogger, Normal, "Parser_CreateRequestInfo");
+
+	return packet;
+}
+
+AGENT_SEND_STATUS SAManager_SendEventNotify( HANDLE const handle, HANDLER_NOTIFY_SEVERITY severity,
+										 void const * const requestData, unsigned int const requestLen, 
+										 void *pRev1, void* pRev2 )
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+	Handler_info* plugin = NULL;
+	susiaccess_packet_body_t* packet = NULL;
+	char topicStr[128] = {0};
+
+	if(g_bUninitialized)
+		return result;
+
+	if(handle == NULL)
+		return result;
+
+	plugin = (Handler_info*)handle;
+
+	if(plugin->agentInfo == NULL)
+		return result;
+
+	packet = SAManager_WrapEventNotifyPacket(handle, severity, requestData, requestLen, false);
+
+	if(packet == NULL)
+	{
+		SAManagerLog(g_samanagerlogger, Warning, "Request Packet is empty!");
+		return result;
+	}
+#ifdef RMM3X
+	sprintf(topicStr, DEF_EVENTNOTIFY_TOPIC, plugin->agentInfo->devId);
+#else
+	sprintf(topicStr, DEF_EVENTNOTIFY_TOPIC, plugin->agentInfo->productId, plugin->agentInfo->devId);
+#endif
+	if(g_publishCB)
+	{
+		if(g_publishCB(topicStr, 0, 0, packet) == 0)
+			result = cagent_success;
+		else
+			result = cagent_send_data_error;
+	}
+	else
+		result = cagent_callback_null;
+
+	if(g_SADataSync)
+		if(g_SADataSync->DataSync_Insert_Data_API)
+			g_SADataSync->DataSync_Insert_Data_API(handle,packet->content,topicStr, general_event_notify_rep);
+
+	if(packet->content)
+		free(packet->content);
+	free(packet);
+	return result;
+}
+
+AGENT_SEND_STATUS SAManager_ConnectServer(char const * ip, int port, char const * mqttauth, tls_type tlstype, char const * psk)
+{
+	AGENT_SEND_STATUS result = cagent_send_data_error;
+/*
+	susiaccess_agent_conf_body_t * pConfig = NULL;
+	susiaccess_agent_profile_body_t * pProfile = NULL;
+
+	pConfig = malloc(sizeof(susiaccess_agent_conf_body_t));
+	if(pConfig)
+	{
+		memset(pConfig, 0, sizeof(susiaccess_agent_conf_body_t));
+		if(g_pConfig)
+			memcpy(pConfig, g_pConfig, sizeof(susiaccess_agent_conf_body_t));
+
+		if(ip)
+		{
+			strncpy(pConfig->serverIP, ip, strlen(ip)+1);
+		}
+
+		if(port>0)
+		{
+			sprintf(pConfig->serverPort, "%d", port);
+		}
+
+		if(mqttauth)
+		{
+			strncpy(pConfig->serverAuth, mqttauth, strlen(mqttauth)+1);
+		}
+
+		pConfig->tlstype = tlstype;
+
+		if(psk)
+		{
+			strncpy(pConfig->psk, psk, strlen(psk)+1);
+		}
+	}
+
+	if(g_pProfile)
+	{
+		pProfile = malloc(sizeof(susiaccess_agent_profile_body_t));
+		if(pProfile)
+		{
+			memset(pProfile, 0, sizeof(susiaccess_agent_profile_body_t));
+			memcpy(pProfile, g_pProfile, sizeof(susiaccess_agent_profile_body_t));
+		}
+	}
+*/
+	if(g_connectserverCB)
+	{
+	
+		//if(g_connectserverCB(pConfig, pProfile) == 0)
+		if(g_connectserverCB(ip, port, mqttauth, tlstype, psk) == 0)
+			result = cagent_success;
+		else
+			result = cagent_connect_error;
+	}
+	else
+		result = cagent_callback_null;
+/*
+	if(pConfig)
+		free(pConfig);
+
+	if(pProfile)
+		free(pProfile);
+*/
+	return result;
+}
+
+AGENT_SEND_STATUS SAManager_Disconnect()
+{
+	AGENT_SEND_STATUS result = cagent_callback_null;
+	if(g_disconnectCB)
+		g_disconnectCB();
+	else
+		result = cagent_callback_null;
+	return result;
+}
+
+AGENT_SEND_STATUS SAManager_Rename(char const * name)
+{
+	if(g_pProfile)
+		strncpy(g_pProfile->hostname, name, sizeof(g_pProfile->hostname));
+	/*if(g_pSALoader)
+	{
+		hlloader_handler_agent_status_update(g_pSALoader, &g_handlerList, g_pConfig, g_pProfile, g_iConnStatus);
+	}*/
+	return cagent_success;
+}
+
+void SAManager_AddVirtualHandler(char *VirName, char *HandlerName)
+{
+	hlloader_load_virtualhandler(g_pSALoader, &g_handlerList,VirName,HandlerName);
+}
+
+void SAManager_RecvInternalCommandReq(char* topic, susiaccess_packet_body_t *pkt, void *pRev1, void* pRev2)
+{
+	if(g_bUninitialized || !pkt || !pkt->content)
+		return;
+	if(g_pSALoader)
+	{
+		hlloader_handler_recv(g_pSALoader,&g_handlerList, topic, pkt, pRev1, pRev2);
+	}
+}
+
+void SAManager_CustMessageRecv(char* topic, susiaccess_packet_body_t *pkt, void *pRev1, void* pRev2)
+{
+	struct samanager_topic_entry * topicentry = samanager_topic_find(topic);
+	if(g_bUninitialized || !pkt || !pkt->content)
+		return;
+	if(topicentry != NULL)
+	{
+		char* pReqInfoPayload = NULL;
+		int length = 0;
+		if(pkt->type == pkt_type_custom)
+			pReqInfoPayload = strdup(pkt->content);
+		else
+			pReqInfoPayload = pkg_parser_packet_print(pkt);
+		length = strlen(pReqInfoPayload);
+		topicentry->callback_func(topic, pReqInfoPayload, length, NULL, NULL);
+		free(pReqInfoPayload);
+	}
+}
+
+AGENT_SEND_STATUS SAManager_SubscribeCustTopic(char const * const topic, HandlerCustMessageRecvCbf recvCbf)
+{
+	if(!g_subscribeCB)
+		return cagent_callback_null;
+
+	if(g_subscribeCB(topic, 1, SAManager_CustMessageRecv) == 0/*saclient_success*/)
+	{
+		struct samanager_topic_entry *topicentry = samanager_topic_find(topic);
+		if(topicentry == NULL)
+		{
+			samanager_topic_add(topic, (samanager_topic_msg_cb_func_t)recvCbf);
+		}	
+		else
+			topicentry->callback_func = (samanager_topic_msg_cb_func_t)recvCbf;
+		SAManagerLog(g_samanagerlogger, Debug, "Subscribe Custom Topic: %s", topic);
+	}
+	else
+		SAManagerLog(g_samanagerlogger, Warning, "Subscribe Custom Topic Fail: %s", topic);
+	return cagent_success;
+}
+
+AGENT_SEND_STATUS SAManager_UnsubscribeCustTopic(char const * const topic)
+{
+	if(!g_unsubscribeCB)
+		return cagent_callback_null;
+	if(g_unsubscribeCB(topic) == 0/*saclient_success*/)
+	{
+		struct samanager_topic_entry *topicentry = samanager_topic_find(topic);
+		if(topicentry)
+		{
+			samanager_topic_remove(topic);
+		}	
+		SAManagerLog(g_samanagerlogger, Debug, "Unsubscribe Custom Topic: %s", topic);
+	}
+	else
+		SAManagerLog(g_samanagerlogger, Warning, "Unsubscribe Custom Topic Fail: %s", topic);
+	return cagent_success;
+}
+
+
+void SAMANAGER_API SAManager_Initialize(susiaccess_agent_conf_body_t * config, susiaccess_agent_profile_body_t * profile, void * loghandle)
+{
+	char workdir[MAX_PATH] = {0};
+
+	g_samanagerlogger = loghandle;
+
+	/*
+	g_pConfig = malloc(sizeof(susiaccess_agent_conf_body_t));
+	memset(g_pConfig, 0, sizeof(susiaccess_agent_conf_body_t));
+	memcpy(g_pConfig, config, sizeof(susiaccess_agent_conf_body_t));
+	g_pProfile = malloc(sizeof(susiaccess_agent_profile_body_t));
+	memset(g_pProfile, 0, sizeof(susiaccess_agent_profile_body_t));
+	memcpy(g_pProfile, profile, sizeof(susiaccess_agent_profile_body_t));
+    */
+
+	g_pConfig = config;
+	g_pProfile = profile;
+
+	if(strlen(profile->workdir)>0)
+		strcpy(workdir, profile->workdir);
+	else
+		util_module_path_get(workdir);
+
+	memset(&g_handlerList, 0, sizeof(Handler_List_t));
+
+	keepalive_initialize(&g_handlerList, profile->workdir, g_samanagerlogger);
+	/*Load Handler Loader*/	
+	g_pSALoader = hlloader_initialize(workdir, config, profile, loghandle);
+	if(g_pSALoader)
+	{
+		Callback_Functions_t functions;
+		memset(&functions, 0, sizeof(Callback_Functions_t));
+		functions.sendcbf = SAManager_SendMessage;
+		functions.sendcustcbf = SAManager_SendCustMessage;
+		functions.subscribecustcbf = SAManager_SubscribeCustTopic;
+		functions.sendreportcbf = SAManager_SendAutoReport;
+		functions.sendcapabilitycbf = SAManager_SendCapability;
+		functions.sendeventcbf = SAManager_SendEventNotify;
+		functions.connectservercbf = SAManager_ConnectServer;
+		functions.disconnectcbf = SAManager_Disconnect;
+		functions.renamecbf = SAManager_Rename;
+		functions.addvirtualhandlercbf = SAManager_AddVirtualHandler;
+		functions.internelreportcbf = SAManager_InternelReport;
+		functions.unsubscribecustcbf = SAManager_UnsubscribeCustTopic;
+		hlloader_cbfunc_set(g_pSALoader, &functions);
+	}
+	/*get initialized Handler_Loader_Interface*/
+	if(g_pSALoader)
+	{
+		{
+			Handler_Loader_Interface GlobalPlugin;
+
+			memset(&GlobalPlugin, 0, sizeof(Handler_Loader_Interface));
+
+			hlloader_basic_handlerinfo_get(g_pSALoader, &GlobalPlugin);
+
+			g_SAGeneral = ghloader_initialize(workdir, config, profile, &g_handlerList, &GlobalPlugin, loghandle);
+
+			if(g_SAGeneral)
+			{
+				hlloader_handlerinfo_add(g_pSALoader, &g_handlerList, &GlobalPlugin);
+			}
+			else
+			{
+				if (GlobalPlugin.pHandlerInfo)
+				{
+					if (GlobalPlugin.pHandlerInfo->agentInfo)
+						free(GlobalPlugin.pHandlerInfo->agentInfo);
+					free(GlobalPlugin.pHandlerInfo);
+				}
+			}
+		}
+
+		{
+			Handler_Loader_Interface RuleEnginePlugin;
+
+			memset(&RuleEnginePlugin, 0, sizeof(Handler_Loader_Interface));
+
+			hlloader_basic_handlerinfo_get(g_pSALoader, &RuleEnginePlugin);
+
+			g_RuleEngine = reloader_initialize(workdir, &RuleEnginePlugin, loghandle);
+			if(g_RuleEngine)
+			{
+				hlloader_handlerinfo_add(g_pSALoader, &g_handlerList, &RuleEnginePlugin);
+			}
+			else
+			{
+				if (RuleEnginePlugin.pHandlerInfo)
+				{
+					if (RuleEnginePlugin.pHandlerInfo->agentInfo)
+						free(RuleEnginePlugin.pHandlerInfo->agentInfo);
+					free(RuleEnginePlugin.pHandlerInfo);
+				}
+			}
+		}
+
+		hlloader_handler_load(g_pSALoader, &g_handlerList, workdir);
+
+		{ // DataSync
+			g_SADataSync = SADataSync_Initialize(g_pSALoader, workdir, &g_handlerList, loghandle);
+			if(g_SADataSync)
+				if(g_SADataSync->DataSync_Initialize_API)
+					g_SADataSync->DataSync_Initialize_API(workdir,&g_handlerList,loghandle);
+		}
+
+		hlloader_handler_start(g_pSALoader, &g_handlerList);
+	}
+
+	g_bUninitialized = false;
+}
+
+void SAMANAGER_API SAManager_Uninitialize()
+{
+	struct samanager_topic_entry *iter_topic = NULL;
+	struct samanager_topic_entry *tmp_topic = NULL;
+	g_bUninitialized = true;;
+	keepalive_uninitialize();
+
+	iter_topic = samanager_topic_first();
+	while(iter_topic != NULL)
+	{
+		tmp_topic = iter_topic->next;
+		samanager_topic_remove(iter_topic->name);
+		iter_topic = tmp_topic;
+	}
+
+	/*Release Handler Loader*/	
+	if(g_pSALoader)
+	{
+		hlloader_handler_release(g_pSALoader, &g_handlerList);
+		hlloader_uninitialize(g_pSALoader);
+		g_pSALoader = NULL;
+	}
+	
+	if(g_SAGeneral)
+	{
+		ghloader_uninitialize(g_SAGeneral);
+		g_SAGeneral = NULL;
+	}
+
+	if(g_RuleEngine)
+	{
+		reloader_uninitialize(g_RuleEngine);
+		g_RuleEngine = NULL;
+	}
+/*
+	if(g_pConfig)
+	{
+		free(g_pConfig);
+		g_pConfig = NULL;
+	}
+
+	if(g_pProfile)
+	{
+		free(g_pProfile);
+		g_pProfile = NULL;
+	}
+*/
+	if(g_SADataSync)
+		if(SADataSync_Uninitialize(g_SADataSync))
+			g_SADataSync=NULL;
+}
+
+void SAMANAGER_API SAManager_SetPublishCB(PUBLISHCB func)
+{
+	g_publishCB = func;
+	if(g_SADataSync)
+		if(g_SADataSync->DataSync_SetFuncCB_API)
+			g_SADataSync->DataSync_SetFuncCB_API(g_publishCB);
+}
+
+void SAMANAGER_API SAManager_SetSubscribeCB(SUBSCRIBECB func)
+{
+	g_subscribeCB = func;
+}
+
+void SAMANAGER_API SAManager_SetUnsubscribeCB(UNSUBSCRIBECB func)
+{
+	g_unsubscribeCB = func;
+}
+
+void SAMANAGER_API SAManager_SetConnectServerCB(CONNECTSERVERCB func)
+{
+	g_connectserverCB = func;
+}
+
+void SAMANAGER_API SAManager_SetDisconnectCB(DISCONNECTCB func)
+{
+	g_disconnectCB = func;
+}
+
+void SAMANAGER_API SAManager_InternalSubscribe()
+{
+	/* Add Topic Callback*/
+	char topicStr[128] = {0};
+	if(!g_pProfile)
+		return;
+#ifdef RMM3X
+	sprintf(topicStr, DEF_CALLBACKREQ_TOPIC, g_pProfile->devId);
+#else
+	sprintf(topicStr, DEF_CALLBACKREQ_TOPIC, g_pProfile->productId, g_pProfile->devId);
+#endif
+	if(g_subscribeCB)
+	{
+		while(g_subscribeCB(topicStr, 0, SAManager_RecvInternalCommandReq)!=0)
+		{
+			SAManagerLog(g_samanagerlogger, Warning, "Subscribe Topic %s Fail", topicStr);
+			if(g_bUninitialized)
+				break;
+			usleep(500000);
+		}
+	}
+	/* Add WISE Core (device) Topic Callback*/
+	memset(topicStr, 0, sizeof(topicStr));
+	sprintf(topicStr, DEF_CALLBACKREQ_TOPIC, "device", g_pProfile->devId);
+	if(g_subscribeCB)
+		g_subscribeCB(topicStr, 0, SAManager_RecvInternalCommandReq);
+
+	/* Add Server Broadcast Topic Callback*/
+	memset(topicStr, 0, sizeof(topicStr));
+	strcpy(topicStr, DEF_AGENTCONTROL_TOPIC);
+	if(g_subscribeCB)
+	{
+		while(g_subscribeCB(topicStr, 0, SAManager_RecvInternalCommandReq)!=0)
+		{
+			SAManagerLog(g_samanagerlogger, Warning, "Subscribe Topic %s Fail", topicStr);
+			if(g_bUninitialized)
+				break;
+			usleep(500000);
+		}
+	}
+}
+
+void SAMANAGER_API SAManager_UpdateConnectState(int status)
+{
+	//if(g_iConnStatus == status)  /*Server redundancy need to count how many times connect failed!*/
+	//	return;
+	
+	time_t t=time(NULL);
+	if(g_iConnStatus==1 && status!=1)
+		if(g_SADataSync)
+			if(g_SADataSync->DataSync_Set_LostTime_API)
+				g_SADataSync->DataSync_Set_LostTime_API((unsigned long long)t);
+	
+
+	if(g_iConnStatus!=1 && status==1) // 0 -> 1 or 2 -> 1
+	{
+		if(g_SADataSync)
+		{
+			if(g_SADataSync->DataSync_Set_ReConTime_API)
+				g_SADataSync->DataSync_Set_ReConTime_API((unsigned long long)t);
+		}
+	}	
+
+	g_iConnStatus = status;
+
+	/*if(conf)
+	{
+		if(!g_pConfig)
+		{
+			g_pConfig = malloc(sizeof(susiaccess_agent_conf_body_t));
+		}
+		memset(g_pConfig, 0, sizeof(susiaccess_agent_conf_body_t));
+		memcpy(g_pConfig, conf, sizeof(susiaccess_agent_conf_body_t));
+
+	}
+
+	if(profile)
+	{
+		if(!g_pProfile)
+		{
+			g_pProfile = malloc(sizeof(susiaccess_agent_profile_body_t));
+		}
+		memset(g_pProfile, 0, sizeof(susiaccess_agent_profile_body_t));
+		memcpy(g_pProfile, profile, sizeof(susiaccess_agent_profile_body_t));
+	}*/
+
+
+	if(g_pSALoader)
+	{
+		hlloader_handler_agent_status_update(g_pSALoader, &g_handlerList, g_pConfig, g_pProfile, status);
+	}
+}

@@ -1,0 +1,906 @@
+diff --git a/Android.mk b/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/Application.mk b/Application.mk
+new file mode 100644
+index 0000000..c50d0fb
+--- /dev/null
++++ b/Application.mk
+@@ -0,0 +1,41 @@
++APP_BUILD_SCRIPT := ./Android.mk 
++
++#===============================================================#
++#							ABIs								#
++#---------------------------------------------------------------#
++#	armeabi 			No hard float.
++#	armeabi-v7a			Hard float supported.
++#	arm64-v8a
++#	x86					No support for MOVBE or SSE4.
++#	x86_64
++#	mips
++#	mips64
++#---------------------------------------------------------------#
++APP_ABI := armeabi-v7a
++
++#================================================================#
++#  NDK-supported API levels and corresponding Android releases   #
++#================================================================#
++#  NDK-supported API level  |    Android release                |
++#----------------------------------------------------------------#
++#|      android-3           |        1.5                        |
++#|      android-4           |        1.6                        |
++#|      android-5           |        2.0                        |
++#|      android-8           |        2.2                        |
++#|      android-9           |        2.3 through 3.0.x          |
++#|      android-12          |        3.1.x                      |
++#|      android-13          |        3.2                        |
++#|      android-14          |        4.0 through 4.0.2          |
++#|      android-15          |        4.0.3 and 4.0.4            |
++#|      android-16          |        4.1 and 4.1.1              |
++#|      android-17          |        4.2 and 4.2.2              |
++#|      android-18          |        4.3                        |
++#|      android-19          |        4.4                        |
++#|      android-21          |        4.4W and 5.0               |
++#----------------------------------------------------------------#
++APP_PLATFORM := android-23
++
++APP_CFLAGS += -DANDROID  -DAES_ENCRYPT
++APP_CFLAGS += -Wno-error=format-security 
++
++APP_STL := gnustl_static
+diff --git a/Lib_OTA/Android.mk b/Lib_OTA/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/Lib_OTA/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/Lib_OTA/Application.mk.old b/Lib_OTA/Application.mk.old
+new file mode 100644
+index 0000000..a979ffe
+--- /dev/null
++++ b/Lib_OTA/Application.mk.old
+@@ -0,0 +1,42 @@
++APP_BUILD_SCRIPT := ./Android.mk 
++
++#===============================================================#
++#							ABIs								#
++#---------------------------------------------------------------#
++#	armeabi 			No hard float.
++#	armeabi-v7a			Hard float supported.
++#	arm64-v8a
++#	x86					No support for MOVBE or SSE4.
++#	x86_64
++#	mips
++#	mips64
++#---------------------------------------------------------------#
++APP_ABI := armeabi-v7a
++
++#================================================================#
++#  NDK-supported API levels and corresponding Android releases   #
++#================================================================#
++#  NDK-supported API level  |    Android release                |
++#----------------------------------------------------------------#
++#|      android-3           |        1.5                        |
++#|      android-4           |        1.6                        |
++#|      android-5           |        2.0                        |
++#|      android-8           |        2.2                        |
++#|      android-9           |        2.3 through 3.0.x          |
++#|      android-12          |        3.1.x                      |
++#|      android-13          |        3.2                        |
++#|      android-14          |        4.0 through 4.0.2          |
++#|      android-15          |        4.0.3 and 4.0.4            |
++#|      android-16          |        4.1 and 4.1.1              |
++#|      android-17          |        4.2 and 4.2.2              |
++#|      android-18          |        4.3                        |
++#|      android-19          |        4.4                        |
++#|      android-21          |        4.4W and 5.0               |
++#----------------------------------------------------------------#
++APP_PLATFORM := android-23
++
++APP_CFLAGS += -DANDROID 
++APP_CFLAGS += -Wno-error=format-security 
++
++APP_STL := gnustl_static
++APP_MODULES := sueclients sueclient
+diff --git a/Lib_OTA/filetransferlib/Android.mk b/Lib_OTA/filetransferlib/Android.mk
+old mode 100644
+new mode 100755
+index ecf01a9..eef955f
+--- a/Lib_OTA/filetransferlib/Android.mk
++++ b/Lib_OTA/filetransferlib/Android.mk
+@@ -2,11 +2,13 @@ LOCAL_PATH	:= $(call my-dir)
+ 
+ include $(CLEAR_VARS)
+ 
+-LOCAL_MODULE			:= libfiletransfer
+-LOCAL_SRC_FILES			:= FileTransferLib.c Util.c
+-LOCAL_STATIC_LIBRARIES	:= libcurl libplatform libbase64
+-
++LOCAL_MODULE			:= filetransfer
++LOCAL_SRC_FILES			:= src/FileTransferLib.c src/Util.c
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/openssl/include/
++LOCAL_STATIC_LIBRARIES	:= libcurl platform base64
++LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
+ LOCAL_EXPORT_C_INCLUDES	:= $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
+-
++#include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/Lib_OTA/filetransferlib/src/FileTransferLib.c b/Lib_OTA/filetransferlib/src/FileTransferLib.c
+index ebc7759..61d5d27 100755
+--- a/Lib_OTA/filetransferlib/src/FileTransferLib.c
++++ b/Lib_OTA/filetransferlib/src/FileTransferLib.c
+@@ -12,9 +12,9 @@
+ 
+ #include "FileTransferLib.h"
+ #include "Util.h"
+-
++#ifndef ANDROID
+ #include "base64.h"
+-
++#endif
+ #include <pthread.h>
+ #include <stdio.h>
+ #include <string.h>
+diff --git a/Lib_OTA/miniunziplib/Android.mk b/Lib_OTA/miniunziplib/Android.mk
+old mode 100644
+new mode 100755
+index 6b79572..2667810
+--- a/Lib_OTA/miniunziplib/Android.mk
++++ b/Lib_OTA/miniunziplib/Android.mk
+@@ -2,14 +2,17 @@ LOCAL_PATH := $(call my-dir)
+ 
+ include $(CLEAR_VARS)
+ 
+-
+ # Module
+-LOCAL_MODULE 			:= libminiunzip 
+-LOCAL_SRC_FILES			:= MiniUnzipLib.c
+-LOCAL_STATIC_LIBRARIES	:= liblog libminiunz
++LOCAL_MODULE 			:= otaunzip 
++LOCAL_C_INCLUDES		:= \
++	$(LOCAL_PATH)/inc/ \
++	$(LOCAL_PATH)/../../lib/log/inc/ \
++	$(LOCAL_PATH)/../../Library3rdParty/minizip/
++LOCAL_SRC_FILES			:= src/MiniUnzipLib.c
++LOCAL_STATIC_LIBRARIES	:= minizip
++LOCAL_LDLIBS += -Wl,--no-warn-shared-textrel
+ 
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
+-
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/Lib_OTA/sueclient/Android.mk b/Lib_OTA/sueclient/Android.mk
+old mode 100644
+new mode 100755
+index 6b3af5c..a4af595
+--- a/Lib_OTA/sueclient/Android.mk
++++ b/Lib_OTA/sueclient/Android.mk
+@@ -1,21 +1,34 @@
+ LOCAL_PATH := $(call my-dir)
+ 
++
++
++##############################################################
++
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ # Module
+-LOCAL_MODULE 			:= libsueclient 
++LOCAL_MODULE 			:= sueclient
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Platform/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/queuehelper/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/sueclientcore/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/zschedule/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/log/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/listhelper/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/iniparser/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/cjson/inc/
+ LOCAL_SRC_FILES			:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
+ LOCAL_STATIC_LIBRARIES	:= \
+-	libsueclientcore \
+-	libzschedule \
+-	liblisthelper \
+-	libcjson \
+-	libqueuehelper \
+-	libplatform \
+-	libinih \
+-	liblog
++	cJSON \
++	ini
++LOCAL_SHARED_LIBRARIES	:= \
++	sueclientcore \
++	queuehelper \
++	listhelper \
++	zschedule
++
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+diff --git a/Lib_OTA/sueclientcore/Android.mk b/Lib_OTA/sueclientcore/Android.mk
+old mode 100644
+new mode 100755
+index 3aa16a9..ccd118d
+--- a/Lib_OTA/sueclientcore/Android.mk
++++ b/Lib_OTA/sueclientcore/Android.mk
+@@ -3,26 +3,38 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+-LOCAL_MODULE 			:= libsueclientcore 
++LOCAL_MODULE 			:= sueclientcore 
+ LOCAL_SRC_FILES			:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Platform/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/log/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/listhelper/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/sqlite/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/xmlhelperlib/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/miniunziplib/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/filetransferlib/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/md5/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/base64/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/des/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/iniparser/inc/
+ LOCAL_STATIC_LIBRARIES	:= \
+-	liblisthelper \
+-	libplatform \
++	md5 \
++	Platform \
++	des
++	
++LOCAL_SHARED_LIBRARIES	:= \
++	sqlite3 \
++	ini \
++	listhelper \
+ 	libxmlhelper \
+-	libsqlite \
+-	libfiletransfer \
+-	libmd5 \
+-	libbase64 \
+-	libdes \
+-	libminiunzip \
+-	liblog \
+-	libinih
++	otaunzip \
++	filetransfer
+ 
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
+-
++#include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/Lib_OTA/sueclientcore/inc/cp_fun.h b/Lib_OTA/sueclientcore/inc/cp_fun.h
+index 86a8a54..1f11ee5 100755
+--- a/Lib_OTA/sueclientcore/inc/cp_fun.h
++++ b/Lib_OTA/sueclientcore/inc/cp_fun.h
+@@ -5,6 +5,9 @@
+ 
+ #ifdef linux
+ 	#define CP_PID_T    pid_t
++#ifdef ANDROID
++	#define WIFCONTINUED(s) ((s) == 0xffff)
++#endif
+ #else 
+ 	#include "windows.h"
+ 
+diff --git a/Lib_OTA/sueclientcore/src/cp_fun.c b/Lib_OTA/sueclientcore/src/cp_fun.c
+index c64cd6f..4f6ab6c 100755
+--- a/Lib_OTA/sueclientcore/src/cp_fun.c
++++ b/Lib_OTA/sueclientcore/src/cp_fun.c
+@@ -318,7 +318,7 @@ int cp_wait_pid(CP_PID_T pid, int* status, unsigned int timeoutMs)
+ 				*status = WTERMSIG(tmpStatus);
+ 				ILOGD(DEF_SUECCORE_L_KEY, "cp_process_launch: WIFSIGNALED, status=%d", *status);
+ 			} else if(WIFSTOPPED(tmpStatus)) {
+-				*status = WSTOPSIG(status);
++				*status = WSTOPSIG(tmpStatus);
+ 				ILOGD(DEF_SUECCORE_L_KEY, "cp_process_launch: WIFSTOPPED, status=%d", *status);
+ 			} else if(WIFCONTINUED(tmpStatus)) {
+ 				ILOGD(DEF_SUECCORE_L_KEY, "cp_process_launch: WIFCONTINUED, status=%d", *status);
+diff --git a/Lib_OTA/zschedule/Android.mk b/Lib_OTA/zschedule/Android.mk
+old mode 100644
+new mode 100755
+index f9ef332..8a107c5
+--- a/Lib_OTA/zschedule/Android.mk
++++ b/Lib_OTA/zschedule/Android.mk
+@@ -3,10 +3,11 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+-LOCAL_MODULE 			:= libzschedule 
++LOCAL_MODULE 			:= zschedule
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
+ LOCAL_SRC_FILES			:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
+ LOCAL_STATIC_LIBRARIES	:= \
+ 	libplatform
+@@ -14,5 +15,5 @@ LOCAL_STATIC_LIBRARIES	:= \
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+ 
+diff --git a/Library3rdParty/Android.mk b/Library3rdParty/Android.mk
+new file mode 100644
+index 0000000..757cb60
+--- /dev/null
++++ b/Library3rdParty/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+\ No newline at end of file
+diff --git a/Library3rdParty/cjson/Android.mk b/Library3rdParty/cjson/Android.mk
+old mode 100644
+new mode 100755
+index f89edeb..e1ac352
+--- a/Library3rdParty/cjson/Android.mk
++++ b/Library3rdParty/cjson/Android.mk
+@@ -2,15 +2,13 @@ LOCAL_PATH := $(call my-dir)
+ 
+ include $(CLEAR_VARS)
+ 
+-# My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
+-
+ # Module
+-LOCAL_MODULE 	:= cJSON 
+-LOCAL_C_INCLUDES:= $(LOCAL_PATH)/../../Include 
+-LOCAL_CFLAGS 	:= -fPIC
+-LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++LOCAL_MODULE 	:= cJSON
++#LOCAL_C_INCLUDES:= $(LOCAL_PATH)/../../Include 
++LOCAL_C_INCLUDES+= $(LOCAL_PATH)/inc/
++#LOCAL_CFLAGS 	:= -fPIC	
++LOCAL_SRC_FILES	:= src/cJSON.c
+ 
+ # Export and Build 
+-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
++# LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
+ include $(BUILD_STATIC_LIBRARY)
+diff --git a/Library3rdParty/iniparser/Android.mk b/Library3rdParty/iniparser/Android.mk
+new file mode 100644
+index 0000000..789c825
+--- /dev/null
++++ b/Library3rdParty/iniparser/Android.mk
+@@ -0,0 +1,14 @@
++LOCAL_PATH := $(call my-dir)
++
++include $(CLEAR_VARS)
++
++# Module
++LOCAL_MODULE 	:= ini
++#LOCAL_C_INCLUDES:= $(LOCAL_PATH)/../../Include 
++LOCAL_C_INCLUDES+= $(LOCAL_PATH)/inc/
++#LOCAL_CFLAGS 	:= -fPIC	
++LOCAL_SRC_FILES	:= src/dictionary.c src/iniparser.c
++
++# Export and Build 
++# LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/Library3rdParty/minizip/Android.mk b/Library3rdParty/minizip/Android.mk
+new file mode 100644
+index 0000000..5737a21
+--- /dev/null
++++ b/Library3rdParty/minizip/Android.mk
+@@ -0,0 +1,37 @@
++LOCAL_PATH := $(call my-dir)
++
++include $(CLEAR_VARS)
++
++# Module
++LOCAL_MODULE 		:= minizip
++#LOCAL_C_INCLUDES	:= $(LOCAL_PATH)/../../Include 
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/lib/bzip2/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/lib/liblzma/api/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/lib/brg/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/../../AndroidLib/lib_src/src_build/libiconv-1.14/include/
++#LOCAL_CFLAGS 		:= -fPIC	
++LOCAL_SRC_FILES	:= \
++	minizip.c \
++	mz_compat.c \
++	mz_crypt.c \
++	mz_os.c \
++	mz_strm.c \
++	mz_strm_buf.c \
++	mz_strm_bzip.c \
++	mz_strm_lzma.c \
++	mz_strm_os_posix.c \
++	mz_strm_mem.c \
++	mz_strm_pkcrypt.c \
++	mz_strm_split.c \
++	mz_strm_wzaes.c \
++	mz_strm_zlib.c \
++	mz_zip.c \
++	mz_zip_rw.c \
++	mz_crypt_openssl.c \
++	mz_os_posix.c
++	
++LOCAL_STATIC_LIBRARIES := libcurl libiconv liblog
++# Export and Build 
++# LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
++include $(BUILD_STATIC_LIBRARY)
+diff --git a/Library3rdParty/sqlite/Android.mk b/Library3rdParty/sqlite/Android.mk
+index 982e9d7..f2f7d02 100755
+--- a/Library3rdParty/sqlite/Android.mk
++++ b/Library3rdParty/sqlite/Android.mk
+@@ -3,15 +3,15 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+-LOCAL_MODULE 	:= sqlite3 
+-LOCAL_CFLAGS 	:= -fPIC
+-LOCAL_C_INCLUDES:= $(LOCAL_PATH)/../../Include
++LOCAL_MODULE 			:= sqlite3 
++LOCAL_CFLAGS 			:= -fPIC
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
+ LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
+ #LOCAL_STATIC_LIBRARIES := Platform
+ 
+ # Export and Build 
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
+-include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+diff --git a/Library3rdParty/zlib/Android.mk b/Library3rdParty/zlib/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/Library3rdParty/zlib/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/Library3rdParty/zlib/zlib123/Android.mk b/Library3rdParty/zlib/zlib123/Android.mk
+new file mode 100644
+index 0000000..33b59e4
+--- /dev/null
++++ b/Library3rdParty/zlib/zlib123/Android.mk
+@@ -0,0 +1,20 @@
++LOCAL_PATH				:= $(call my-dir)
++
++#include $(LOCAL_PATH)/config_android.mk 
++
++include $(CLEAR_VARS)
++
++MY_C_FILE_LIST			:= $(wildcard $(LOCAL_PATH)/*.c)
++
++# Module
++LOCAL_MODULE 			:= miniunz
++LOCAL_CFLAGS 			:= $(LIB_CFLAGS) 
++#LOCAL_LDFLAGS 			:= -lz -ldl
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/
++LOCAL_SRC_FILES			:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++
++# Export and Build 
++LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/lib 
++#include $(BUILD_SHARED_LIBRARY)
++include $(BUILD_STATIC_LIBRARY)
++
+diff --git a/Modules/Android.mk b/Modules/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/Modules/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/Modules/OTAHandler/Android.mk b/Modules/OTAHandler/Android.mk
+index 84971a9..a0e8587 100755
+--- a/Modules/OTAHandler/Android.mk
++++ b/Modules/OTAHandler/Android.mk
+@@ -3,14 +3,17 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ LOCAL_MODULE 			:= otaHandler
+-LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/../../Include/ 
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/../../Include/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../lib/log/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/cjson/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/sueclient/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Lib_OTA/sueclientcore/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Library3rdParty/iniparser/inc/
++LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/../../Platform/
+ LOCAL_CFLAGS 			:= -fPIC
+-LOCAL_SRC_FILES			:= OTAHandler.c
+-LOCAL_STATIC_LIBRARIES	:= \
+-						Log \
+-						cJSON \
+-						Platform
+-# LOCAL_SHARED_LIBRARIES	:= $(LOCAL_PATH)/../../Library3rdParty/OTA-SUEClient/Android-23-x86/libsueclient
++LOCAL_SRC_FILES			:= src/OTAHandler.c
++LOCAL_STATIC_LIBRARIES	:= cJSON ini Platform
+ LOCAL_SHARED_LIBRARIES	:= sueclient
+ 
+ $(warning $(LOCAL_SHARED_LIBRARIES))
+diff --git a/build/android_build.sh b/build/android_build.sh
+new file mode 100755
+index 0000000..fe4f433
+--- /dev/null
++++ b/build/android_build.sh
+@@ -0,0 +1,97 @@
++#!/bin/bash 
++OPTIND=1
++#	This is a build control script for Android.
++#	You should install the latest Android NDK before run to build.
++
++# User configure vars
++MY_PROJECT_PATH=../
++
++# Cmd line
++DEBUG_LEVEL=1
++BUILD_CMD=ndk-build
++ANDROID_TARGET_ABI=armeabi-v7a
++
++ndk_env_test()
++{
++	test_res=`${BUILD_CMD} -v 2>&1 | grep 'command not found'`
++	if [ -n "$test_res" ]; then 
++		echo "Can't found 'ndk-build' command!"
++		exit 1
++	fi
++}
++
++usage()
++{
++	echo -e "Android build usage:\n"
++	echo -e "./android_build.sh [\033[4mOPTIONS\033[24m]\n"
++	echo -e "\t-c, --clean\tlike make clean\n"
++	echo -e "\t-d, --debug\tbuild debug version\n"
++	echo -e "\t-b, --build\tbuild release version, this is default option\n"
++	echo -e "\t-h, --help\tusage\n"
++}
++
++
++CLEAN=0
++BUILD=0
++DEBUG=0
++arg_parser()
++{	
++	while getopts "d:b:c:h" opt
++	do
++		case "$opt" in
++		  c ) CLEAN=1 ANDROID_TARGET_ABI="$OPTARG" ;;
++		  b ) BUILD=1 ANDROID_TARGET_ABI="$OPTARG" ;;
++		  d ) DEBUG=1 ANDROID_TARGET_ABI="$OPTARG" ;;
++		  h ) HELP=1 usage ;; # Print helpFunction in case parameter is non-existent
++		  * )
++			echo  "syntax error!"
++			echo  "try '-h' or '--help' for more infomation."
++			exit 2
++			;;
++		esac
++	done
++}
++
++############## main ###############
++# 'ndk-build' command check
++ndk_env_test
++
++# arguments parser
++if [ $# -eq 0 ]; then 
++	arg_parser "-b"
++else 
++	arg_parser $*
++fi 
++
++echo "CLEAN: $CLEAN"
++echo "DEBUG: $DEBUG"
++echo "BUILD: $BUILD"
++
++# Change work dirctory, be careful
++cd "${MY_PROJECT_PATH}"
++
++MY_ANDROID_BUILD="${BUILD_CMD} \
++	APP_ABI=${ANDROID_TARGET_ABI} \
++	NDK_PROJECT_PATH=./ \
++	NDK_APPLICATION_MK=./Application.mk"
++
++# Clean 
++if [ $CLEAN -eq 1 ]; then 
++	${MY_ANDROID_BUILD} clean
++	echo "Remove 'libs' and 'obj' folder."
++	rm -rvf ./libs ./obj
++fi
++
++# Debug
++if [ $DEBUG -eq 1 ]; then 
++	MY_ANDROID_BUILD="${MY_ANDROID_BUILD} NDK_DEBUG=${DEBUG_LEVEL}"
++fi
++
++# Build
++if [ $BUILD -eq 1 ]; then
++	${MY_ANDROID_BUILD}
++fi
++
++exit 0
++
++
+diff --git a/lib/Android.mk b/lib/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/lib/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/lib/advtools/AdvLog/Android.mk b/lib/advtools/AdvLog/Android.mk
+new file mode 100644
+index 0000000..da634c3
+--- /dev/null
++++ b/lib/advtools/AdvLog/Android.mk
+@@ -0,0 +1,19 @@
++LOCAL_PATH := $(call my-dir)
++
++include $(CLEAR_VARS)
++
++# My macros define 
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.cpp)
++
++# Module
++LOCAL_MODULE 		:= advlog
++LOCAL_SRC_FILES		:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++LOCAL_C_INCLUDES	:= $(LOCAL_PATH)/include/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/include/internal/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/../../advtools/AdvJSON/inc/
++
++# Export
++LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
++
++include $(BUILD_STATIC_LIBRARY)
++
+diff --git a/lib/advtools/Android.mk b/lib/advtools/Android.mk
+new file mode 100644
+index 0000000..69f3188
+--- /dev/null
++++ b/lib/advtools/Android.mk
+@@ -0,0 +1,2 @@
++
++include $(call all-subdir-makefiles)
+diff --git a/lib/base64/Android.mk b/lib/base64/Android.mk
+new file mode 100644
+index 0000000..5a31df4
+--- /dev/null
++++ b/lib/base64/Android.mk
+@@ -0,0 +1,13 @@
++LOCAL_PATH := $(call my-dir)
++
++include $(CLEAR_VARS)
++
++LOCAL_MODULE	:= base64
++LOCAL_C_INCLUDES	:= $(LOCAL_PATH)/inc/
++LOCAL_SRC_FILES	:= \
++	src/base64.c
++
++LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
++
++include $(BUILD_STATIC_LIBRARY)
++
+diff --git a/lib/des/Android.mk b/lib/des/Android.mk
+old mode 100644
+new mode 100755
+index 8d89687..4cf8676
+--- a/lib/des/Android.mk
++++ b/lib/des/Android.mk
+@@ -3,8 +3,9 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ LOCAL_MODULE	:= des
++LOCAL_C_INCLUDES	:= $(LOCAL_PATH)/inc/
+ LOCAL_SRC_FILES	:= \
+-	DES.c
++	src/des.c
+ 
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+diff --git a/lib/listhelper/Android.mk b/lib/listhelper/Android.mk
+old mode 100644
+new mode 100755
+index f3c25e7..e0d95a0
+--- a/lib/listhelper/Android.mk
++++ b/lib/listhelper/Android.mk
+@@ -3,14 +3,15 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+-LOCAL_MODULE 	:= liblisthelper 
++LOCAL_MODULE 	:= listhelper 
+ LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++LOCAL_C_INCLUDES+= $(LOCAL_PATH)/inc/
+ 
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+ 
+diff --git a/lib/log/Android.mk b/lib/log/Android.mk
+old mode 100644
+new mode 100755
+index 55500b1..5ff9b32
+--- a/lib/log/Android.mk
++++ b/lib/log/Android.mk
+@@ -6,12 +6,13 @@ include $(CLEAR_VARS)
+ MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.cpp)
+ 
+ # Module
+-LOCAL_MODULE 	:= Log 
+-LOCAL_C_INCLUDES:= $(LOCAL_PATH)/../../Include 
++LOCAL_MODULE 	:= log 
++LOCAL_C_INCLUDES:= $(LOCAL_PATH)/inc/
++LOCAL_C_INCLUDES	+= $(LOCAL_PATH)/../../lib/advtools/AdvLog/include/
+ LOCAL_CXXFLAGS 	:= -fPIC
+-LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
++LOCAL_SRC_FILES	:= src/Log.cpp
+ LOCAL_STATIC_LIBRARIES := advlog
+ 
+ # Export and Build 
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH) 
+-include $(BUILD_STATIC_LIBRARY)
++#include $(BUILD_STATIC_LIBRARY)
+diff --git a/lib/log/inc/Log.h b/lib/log/inc/Log.h
+old mode 100644
+new mode 100755
+index 5d38a0c..2391401
+--- a/lib/log/inc/Log.h
++++ b/lib/log/inc/Log.h
+@@ -37,7 +37,7 @@ typedef int LOGMODE;
+ #define LOG_MODE_NULL_OUT         0x00
+ #define LOG_MODE_CONSOLE_OUT      0x01
+ #define LOG_MODE_FILE_OUT         0x02
+-
++#define DEF_LOG_MODE    (LOG_MODE_CONSOLE_OUT|LOG_MODE_FILE_OUT)
+ typedef enum LogLevel { 
+    Debug = 0,
+    Normal, 
+@@ -60,11 +60,15 @@ SALOG_EXPORT int SALOG_CALL TransId(int level);
+ SALOG_EXPORT void SALOG_CALL PrintAndWriteLog(int level, const char *file, const char *func, const char *line, const char* levels, const char *fmt, ...);
+ 
+ SALOG_EXPORT void SALOG_CALL ElsWriteLog(const char *DataPath, const char *data, int len);
+-
++#ifdef ANDROID
++#define WriteLog(logHandle, logMode, level, format, ...) do {\
++} while (0)
++#else
+ //SALOG_EXPORT void SALOG_CALL WriteLog(LOGHANDLE logHandle, LOGMODE logMode, LogLevel level, const char * format, ...);
+ #define WriteLog(logHandle, logMode, level, format, ...) do {\
+ 	PrintAndWriteLog(TransId(level),__FILE__, __func__, S__LINE__,#level, format"\n", ##__VA_ARGS__);\
+ } while (0)
++#endif
+ //#define WriteLog(logHandle, logMode, level, format, ...)
+ //int GetLogID(LOGHANDLE logHandle, char * logname);
+ 
+@@ -75,6 +79,7 @@ SALOG_EXPORT void SALOG_CALL ElsWriteLog(const char *DataPath, const char *data,
+ 	PrintAndWriteLog(TransId(level),__FILE__, __func__, S__LINE__,#level, format"\n", ##__VA_ARGS__);\
+ } while (0)
+ //#define WriteIndividualLog(logHandle, group, logMode, level, format, ...)
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/lib/log/src/Log.cpp b/lib/log/src/Log.cpp
+index 975b252..9084bd1 100755
+--- a/lib/log/src/Log.cpp
++++ b/lib/log/src/Log.cpp
+@@ -171,8 +171,11 @@ SALOG_EXPORT int SALOG_CALL TransId(int level) {
+ 			return LOG_INFO;
+ 	}
+ }
+-
++#ifdef ANDROID
++void PrintAndWriteLog(int level, const char *file, const char *func, const char *line, const char* levels, const char *fmt, ...)
++#else
+ SALOG_EXPORT void SALOG_CALL PrintAndWriteLog(int level, const char *file, const char *func, const char *line, const char* levels, const char *fmt, ...)
++#endif
+ {
+ 	int status = AdvLog_Status(NULL, level);
+ 	char def_str[] = "default";
+diff --git a/lib/md5/Android.mk b/lib/md5/Android.mk
+old mode 100644
+new mode 100755
+index 948575a..25567ce
+--- a/lib/md5/Android.mk
++++ b/lib/md5/Android.mk
+@@ -3,10 +3,11 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+ LOCAL_MODULE 	:= libmd5 
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
+ LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
+ 
+ # Export
+diff --git a/lib/queuehelper/Android.mk b/lib/queuehelper/Android.mk
+old mode 100644
+new mode 100755
+index 2c30f52..79e1c28
+--- a/lib/queuehelper/Android.mk
++++ b/lib/queuehelper/Android.mk
+@@ -3,14 +3,15 @@ LOCAL_PATH := $(call my-dir)
+ include $(CLEAR_VARS)
+ 
+ # My macros define 
+-MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/*.c)
++MY_C_FILE_LIST	:= $(wildcard $(LOCAL_PATH)/src/*.c)
+ 
+ # Module
+-LOCAL_MODULE 	:= libqueuehelper
++LOCAL_MODULE 	:= queuehelper
++LOCAL_C_INCLUDES		:= $(LOCAL_PATH)/inc/
+ LOCAL_SRC_FILES	:= $(MY_C_FILE_LIST:$(LOCAL_PATH)/%=%)
+ 
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
+ 
+diff --git a/lib/xmlhelperlib/Android.mk b/lib/xmlhelperlib/Android.mk
+old mode 100644
+new mode 100755
+index 91c9b08..044c4fd
+--- a/lib/xmlhelperlib/Android.mk
++++ b/lib/xmlhelperlib/Android.mk
+@@ -4,7 +4,16 @@ include $(CLEAR_VARS)
+ 
+ # Module
+ LOCAL_MODULE 			:= libxmlhelper
+-LOCAL_SRC_FILES			:= XmlHelperLib.c
++LOCAL_SRC_FILES			:= \
++	../../Platform/Linux/util_path.c \
++	src/XmlHelperLib.c
++
++LOCAL_C_INCLUDES		:= \
++	$(LOCAL_PATH)/inc/ \
++	$(LOCAL_PATH)/../../Platform/ \
++	$(LOCAL_PATH)/../../AndroidLib/lib_src/src_build/output/xml2-pre/include/ \
++	$(LOCAL_PATH)/../../AndroidLib/iconv-pre/include/
++
+ LOCAL_STATIC_LIBRARIES	:= \
+ 	libplatform \
+ 	libxml2
+@@ -12,5 +21,7 @@ LOCAL_STATIC_LIBRARIES	:= \
+ # Export
+ LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+ 
+-include $(BUILD_STATIC_LIBRARY)
++#include $(BUILD_STATIC_LIBRARY)
++include $(BUILD_SHARED_LIBRARY)
++
+ 

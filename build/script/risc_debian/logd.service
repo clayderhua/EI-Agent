@@ -1,0 +1,13 @@
+[Unit]
+Description=logd
+After=networking.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/local/AgentService
+ExecStart=/usr/local/AgentService/logd
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

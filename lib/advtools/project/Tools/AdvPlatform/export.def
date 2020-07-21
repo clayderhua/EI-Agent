@@ -1,0 +1,18 @@
+LIBRARY	"AdvPlatform"
+
+EXPORTS
+	shmget
+	shmat
+	shmdt
+	
+	getopt
+	getoptarg
+	getoptind
+	getppid
+	
+	pthread_mutex_init
+	pthread_create
+	
+	dlopen
+	dlerror
+	dlsym

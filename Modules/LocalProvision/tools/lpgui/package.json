@@ -1,0 +1,18 @@
+{
+  "name": "lpgui",
+  "version": "1.0.3",
+  "private": true,
+  "description": "a gui tool for local provision",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win32": "electron-packager . LocalProvision --extra-resource=resources/tools --platform=win32 --arch=x64 --icon=assets/icons/icon_x4B_icon.ico --overwrite --asar --out=dist --ignore=node_modules/electron-* --version-string.CompanyName=Advantech --version-string.ProductName=LocalProvision"
+  },
+  "author": "terry.lu",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^6.0.0",
+    "electron-packager": "^14.0.4"
+  }
+}

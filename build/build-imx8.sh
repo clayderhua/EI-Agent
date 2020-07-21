@@ -1,0 +1,1 @@
+../build-env/build-imx8.sh

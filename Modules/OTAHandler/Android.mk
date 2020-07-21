@@ -1,0 +1,16 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE 			:= otaHandler
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Include
+LOCAL_C_INCLUDES		+= $(LOCAL_PATH)/inc/
+LOCAL_CFLAGS 			:= -fPIC
+LOCAL_SRC_FILES			:= src/OTAHandler.c
+LOCAL_STATIC_LIBRARIES	:= cJSON ini Platform
+LOCAL_SHARED_LIBRARIES	:= sueclient Log
+
+$(warning $(LOCAL_SHARED_LIBRARIES))
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/inc
+include $(BUILD_SHARED_LIBRARY)

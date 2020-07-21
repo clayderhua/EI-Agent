@@ -1,0 +1,13 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE	:= des
+LOCAL_C_INCLUDES	:= $(LOCAL_PATH)/inc
+LOCAL_SRC_FILES	:= \
+	src/des.c
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/inc
+
+include $(BUILD_STATIC_LIBRARY)
+
